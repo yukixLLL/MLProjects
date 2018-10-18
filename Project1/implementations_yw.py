@@ -1,5 +1,12 @@
 import numpy as np
 
+import numpy as np
+import matplotlib.pyplot as plt
+
+from proj1_helpers import *
+from data_preprocessing import *
+from costs import *
+
 """"""
 def compute_gradient(y, tx, w):
     """Compute the gradient."""
@@ -56,3 +63,4 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
         print("Stochastic Gradient Descent({bi}/{ti}): loss={l}, w0={w0}, w1={w1}, gradient={gradient}".format(
             bi=n_iter, ti=max_iters - 1, l=loss, w0=w[0], w1=w[1], gradient=gradient))
     return losses, ws
+

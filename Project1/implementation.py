@@ -6,10 +6,6 @@ from proj1_helpers import *
 from data_preprocessing import *
 from costs import *
 
-y, x, ids = load_csv_data("train.csv", sub_sample=False)
-x, mean_x, std_x = standardize(x)
-y, tx = build_model_data(x, y)
-
 """
 least_squares_GD
 """
@@ -48,9 +44,6 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     Takes as input two iterables (here the output desired values 'y' and the input data 'tx')
     Outputs an iterator which gives mini-batches of `batch_size` matching elements from `y` and `tx`.
     Data can be randomly shuffled to avoid ordering in the original data messing with the randomness of the minibatches.
-    Example of use :
-    for minibatch_y, minibatch_tx in batch_iter(y, tx, 32):
-        <DO-SOMETHING>
     """
     data_size = len(y)
 
@@ -80,3 +73,46 @@ def least_squares_SGD(y, tx, initial_w, batch_size, max_iters, gamma):
             loss = compute_loss(y, tx, w)
         print("SGD({bi}/{ti}): loss={l}".format(bi=n_iter, ti=max_iters - 1, l=loss))
     return loss, w
+
+"""
+Ridge regression
+"""
+
+def build_poly(x, degree):
+    """polynomial basis functions for input data x, for j=0 up to j=degree."""
+    x_extended = np.zeros((len(x),degree + 1))
+    for i in range(degree+1):
+        x_extended[:,i] = np.power(x, i)
+    return x_extended
+
+def ridge_regression(y, tx, lambda_):
+    """implement ridge regression."""
+    # ***************************************************
+    # INSERT YOUR CODE HERE
+    # ridge regression: TODO
+    # ***************************************************
+    a = tx.T.dot(tx) + lambda_ * 2 * len(y) * np.identity(tx.shape[1])
+    b = tx.T.dot(y)
+    w_ridge = np.linalg.solve(a, b)
+    return w_ridge
+
+"""
+Cross-Validation
+"""
+def split_data(x, y, ratio, myseed=1):
+    """split the dataset based on the split ratio."""
+    # set seed
+    np.random.seed(myseed)
+    # generate random indices
+    num_row = len(y)
+    indices = np.random.permutation(num_row)
+    index_split = int(np.floor(ratio * num_row))
+    index_tr = indices[: index_split]
+    index_te = indices[index_split:]
+    # create split
+    x_tr = x[index_tr]
+    x_te = x[index_te]
+    y_tr = y[index_tr]
+    y_te = y[index_te]
+    return x_tr, x_te, y_tr, y_te
+
