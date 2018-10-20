@@ -20,3 +20,11 @@ def build_model_data(height, weight):
     num_samples = len(y)
     tx = np.c_[np.ones(num_samples), x]
     return y, tx
+
+
+def replace_999_by_value(x, value):
+    for idr, row in enumerate(x):
+        for idc, col in enumerate(row):
+            if col == -999:
+                x[idr][idc] = value
+    return x

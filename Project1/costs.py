@@ -16,11 +16,11 @@ def calculate_mae(e):
     return np.mean(np.abs(e))
 
 
-def compute_loss(y, tx, w):
+def compute_loss(y, tx, w, mse=True):
     """Calculate the loss.
-
-    You can calculate the loss using mse or mae.
     """
     e = y - tx.dot(w)
-    return calculate_mse(e)
-    # return calculate_mae(e)
+    if mse:
+        return calculate_mse(e)
+    else:
+        return calculate_mae(e)
