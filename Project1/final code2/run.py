@@ -3,20 +3,22 @@
 from implementation import *
 from cross_validation import *
 
+TRAIN_PATH = "../data/train.csv"
+TEST_PATH = "../data/test.csv"
 
 def main():
     # without_data_preprocessing()
     # with_correlation_feature_cross_product()
-#     split_into_8_subset()
-    logistic_without_data_preprocessing()
+     split_into_8_subset()
+#    logistic_without_data_preprocessing()
 #     logistic_with_correlation_feature_cross_product()
 
 def without_data_preprocessing():
     """optimize ridge regression without data pre-processing"""
-    y, x, ids = load_csv_data("train.csv", sub_sample=False)
+    y, x, ids = load_csv_data(TRAIN_PATH, sub_sample=False)
     x, mean_x, std_x = standardize(x)
     print("shape of x {x} shape of y {y}".format(x=x.shape, y=y.shape))
-    y_test, x_test, ids_test = load_csv_data("test.csv", sub_sample=False)
+    y_test, x_test, ids_test = load_csv_data(TEST_PATH, sub_sample=False)
     x_test, _, _ = standardize(x_test, mean_x, std_x)
 
     degrees = np.arange(2, 3)
@@ -36,9 +38,9 @@ def without_data_preprocessing():
 
 
 def with_correlation_feature_cross_product():
-    y, x, ids = load_csv_data("train.csv", sub_sample=False)
+    y, x, ids = load_csv_data(TRAIN_PATH, sub_sample=False)
     print("shape of x {x} shape of y {y}".format(x=x.shape, y=y.shape))
-    y_test, x_test, ids_test = load_csv_data("test.csv", sub_sample=False)
+    y_test, x_test, ids_test = load_csv_data(TEST_PATH, sub_sample=False)
 
     x_train, x_valid_means = handle_missing(x)
     # Get indexes of the features that have a correlation with labels bigger that the threshold
@@ -73,8 +75,6 @@ def with_correlation_feature_cross_product():
 
 def split_into_8_subset():
     # data pre-processing
-    train_path = "./data/train.csv"
-    test_path = "./data/test.csv"
     # y_tr, x_tr, ids_tr, y_te, x_te, ids_te = load_data(train_path, test_path)
     # headers = load_headers(train_path)
     # split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te, headers)
@@ -143,10 +143,10 @@ def predict(xs_test, ids_test, x_means, x_stds, degrees, weights):
 
 def logistic_without_data_preprocessing():
     """logistic regression without data pre-processing"""
-    y, x, ids = load_csv_data("train.csv", sub_sample=False)
+    y, x, ids = load_csv_data(TRAIN_PATH, sub_sample=False)
     x, mean_x, std_x = standardize(x)
     print("shape of x {x} shape of y {y}".format(x=x.shape, y=y.shape))
-    y_test, x_test, ids_test = load_csv_data("test.csv", sub_sample=False)
+    y_test, x_test, ids_test = load_csv_data(TEST_PATH, sub_sample=False)
     x_test, _, _ = standardize(x_test, mean_x, std_x)
 
     #pre-process data
@@ -167,9 +167,9 @@ def logistic_without_data_preprocessing():
     
 def logistic_with_correlation_feature_cross_product():
     """logistic regression with feature cross product"""
-    y, x, ids = load_csv_data("train.csv", sub_sample=False)
+    y, x, ids = load_csv_data(TRAIN_PATH, sub_sample=False)
     print("shape of x {x} shape of y {y}".format(x=x.shape, y=y.shape))
-    y_test, x_test, ids_test = load_csv_data("test.csv", sub_sample=False)
+    y_test, x_test, ids_test = load_csv_data(TEST_PATH, sub_sample=False)
     
     x_train, x_valid_means = handle_missing(x)
     # Get indexes of the features that have a correlation with labels bigger that the threshold
