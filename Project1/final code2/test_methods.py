@@ -1,7 +1,7 @@
-
-
 from implementation import *
 from cross_validation import *
+
+TRAIN_PATH = "../data/train.csv"
 
 
 def main():
@@ -12,7 +12,7 @@ def main():
     the other is used for test to see the accuracy of the methods
     if you want to see the best model, you need to run run.py
     """
-    y, x, ids = load_csv_data("train.csv", sub_sample=False,cut_values=False)
+    y, x, ids = load_csv_data(TRAIN_PATH, sub_sample=False,cut_values=False)
     x, mean_x, std_x = standardize(x)
 
     ratio = 0.5
@@ -21,19 +21,20 @@ def main():
           "the shape of y_test: {yii}, the shape of x_test: {xii}"
           .format(yi=y_tr.shape, xi=x_tr.shape, yii=y_te.shape, xii=x_te.shape))
 
-    # least_squares_gd_test(y_tr, y_te, x_tr, x_te)
+    least_squares_gd_test(y_tr, y_te, x_tr, x_te)
 
-    # least_squares_sgd_test(y_tr, y_te, x_tr, x_te)
+    least_squares_sgd_test(y_tr, y_te, x_tr, x_te)
 
-    # least_squares_test(y_tr, y_te, x_tr, x_te)
+    least_squares_test(y_tr, y_te, x_tr, x_te)
 
-#     ridge_regression_test(y_tr, y_te, x_tr, x_te)
+    ridge_regression_test(y_tr, y_te, x_tr, x_te)
     
-#     logistic_regression_test(y_tr,y_te,x_tr,x_te)
+    logistic_regression_test(y_tr,y_te,x_tr,x_te)
 
     reg_logistic_regression_test(y_tr,y_te,x_tr,x_te)
 
 def least_squares_gd_test(y_tr, y_te, x_tr, x_te):
+    print("\nTesting least sqaures gd test")
     y_train, x_train = build_model_data(y_tr, x_tr)
     initial_w = np.zeros(x_train.shape[1])
     max_iters = 500
@@ -50,6 +51,7 @@ def least_squares_gd_test(y_tr, y_te, x_tr, x_te):
 
 
 def least_squares_sgd_test(y_tr, y_te, x_tr, x_te):
+    print("\nTesting least sqaures sgd test")
     y_train, x_train = build_model_data(y_tr, x_tr)
     initial_w = np.zeros(x_train.shape[1])
     batch_size = 1
@@ -66,6 +68,7 @@ def least_squares_sgd_test(y_tr, y_te, x_tr, x_te):
 
 
 def least_squares_test(y_tr, y_te, x_tr, x_te):
+    print("\nTesting least sqaures test")
     y_train, x_train = build_model_data(y_tr, x_tr)
     weight_star, loss_train = least_squares(y_train, x_train)
 
@@ -78,6 +81,7 @@ def least_squares_test(y_tr, y_te, x_tr, x_te):
 
 
 def ridge_regression_test(y_tr, y_te, x_tr, x_te):
+    print("\nTesting ridge regression test")
     # use cross-validation to find best degree and lambda_
     degrees = np.arange(2, 6)
     k_fold = 4
@@ -96,7 +100,10 @@ def ridge_regression_test(y_tr, y_te, x_tr, x_te):
 
     print("Train loss: {l_tr:.4f}, test_loss: {l_te:.4f}, accuracy of Ridge Regression is: {accu: .4f}".format(
         l_tr=loss_train, l_te=loss_test, accu=accuracy))
-def logistic_regression_test(y_tr,y_te,x_tr,x_te):    
+
+
+def logistic_regression_test(y_tr,y_te,x_tr,x_te):
+    print("\n Testing logicistic regression test")
     #pre-process data
     y_tr,tx_tr,y_te,tx_te=data_preprocess_logsitic(y_tr,x_tr,x_te,y_te,'test')
     
@@ -113,8 +120,10 @@ def logistic_regression_test(y_tr,y_te,x_tr,x_te):
     accuracy =degree_of_accuracy_logitstic(y_te, tx_te, log_w)
     print("Train loss: {l_tr:.4f}, test_loss: {l_te:.4f}, accuracy of Logistic Regression is: {accu: .4f}".format(
         l_tr=log_loss, l_te=loss_test, accu=accuracy))
+
     
 def reg_logistic_regression_test(y_tr,y_te,x_tr,x_te):
+    print("\n Testing reg logicistic regression test")
     #pre-process data
     y_tr,tx_tr,y_te,tx_te=data_preprocess_logsitic(y_tr,x_tr,x_te,y_te,'test')
     #initial parameters

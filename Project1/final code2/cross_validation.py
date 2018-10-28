@@ -41,7 +41,7 @@ def best_param_selection(y, x, degrees, k_fold, lambdas, seed=4):
     # split data in k fold
     k_indices = build_k_indices(y, k_fold, seed)
 
-    # for each degree, we compute the best lambdas and the associated rmse
+    # for each degree, we compute the best lambdas and the associated rmse and accuracy
     best_lambdas = []
     best_rmses = []
     best_accuracy = []
@@ -62,19 +62,15 @@ def best_param_selection(y, x, degrees, k_fold, lambdas, seed=4):
             rmse_te.append(np.mean(rmse_te_tmp))
             accuracy_te.append(np.mean(accuracy_te_tmp))
 
-        # ind_lambda_opt = np.argmin(rmse_te)
+        # We aim to maximize the accuracy of the test prediciton
         ind_accuracy_opt = np.argmax(accuracy_te)
-        # best_lambdas.append(lambdas[ind_lambda_opt])
         best_lambdas.append(lambdas[ind_accuracy_opt])
-        # best_rmses.append(rmse_te[ind_lambda_opt])
         best_rmses.append(rmse_te[ind_accuracy_opt])
-        # best_accuracy.append(accuracy_te[ind_lambda_opt])
         best_accuracy.append(accuracy_te[ind_accuracy_opt])
         print("-------------Degree: {d}, test_loss: {l_te:.4f}, lambda: {lam}, best_accuracy: {accu}-----------------".
               format(d=degree, l_te=rmse_te[ind_accuracy_opt],
                      lam=lambdas[ind_accuracy_opt], accu=accuracy_te[ind_accuracy_opt]))
 
-    # ind_best = np.argmin(best_rmses)
     ind_best = np.argmax(best_accuracy)
     print("*********Best Degree: {d}, best_test_loss: {l_te:.4f}, Best_lambda: {lam}, best accuracy: {accu}***********".
           format(d=degrees[ind_best], l_te=best_rmses[ind_best], lam=best_lambdas[ind_best], accu=best_accuracy[ind_best]))

@@ -7,9 +7,10 @@ import numpy as np
 
 """---------------DATA PRE-PROCESSING FUNCTION---------------"""
 
-
+DATA_PATH = "../data/"
 USE_COLS = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 25, 26, 28, 29, 31)
-
+LEFT_SKEWED = ['DER_mass_vis', 'DER_mass_jet_jet', 'DER_sum_pt', 'DER_pt_ratio_lep_tau',
+              'PRI_tau_pt', 'PRI_lep_pt', 'PRI_met', 'PRI_met_sumet', 'PRI_jet_subleading_pt']
 
 def load_data(train_path, test_path):
     print('Split_data_according_to_jet')
@@ -72,7 +73,7 @@ def output_to_csv(x, y, ids, headers, jet, isTrain, isMassValid):
         headers = np.delete(headers, np.where(headers == 'DER_mass_MMC'))
 
     # Generate file name
-    base = './data/train_' if isTrain else './data/test_'
+    base = DATA_PATH + 'train_' if isTrain else DATA_PATH + 'test_'
     valid = '_valid_mass' if isMassValid else '_invalid_mass'
     file_name = base + 'jet_' + str(jet) + valid + '.csv'
 
@@ -93,10 +94,14 @@ def output_to_csv(x, y, ids, headers, jet, isTrain, isMassValid):
                 data_[headers[idx + 2]] = float(x_value)
             writer.writerow(data_)
 
+    return file_name, headers[2:]
+
 
 def split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te, headers):
     print("The shape of x_tr: ", x_tr.shape)
     print("The shape of x_te: ", x_te.shape)
+    # Save the headers of each csv files for later use
+    all_headers = dict()
     for jet in range(4):
         print("\n\nSplitting both train and test data for jet {}, remove the col PRI_jet_num".format(jet))
         # PRI_jet_num (24 -> 24 - 3 cols dropped before 24 - 2 cols (id, label) = col 19)
@@ -167,12 +172,18 @@ def split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te,
         # Save into CSV
         #x, y, ids, headers, jet, isTrain, isMassValid
         # TRAIN
-        output_to_csv(x_tr_jet_invalid_mass, y_tr_jet_invalid_mass, ids_tr_jet_invalid_mass, headers_jet, jet, True, False)
-        output_to_csv(x_tr_jet_valid_mass, y_tr_jet_valid_mass, ids_tr_jet_valid_mass, headers_jet, jet, True, True)
+        file_name, header = output_to_csv(x_tr_jet_invalid_mass, y_tr_jet_invalid_mass, ids_tr_jet_invalid_mass, headers_jet, jet, True, False)
+        all_headers[file_name] = header
+        file_name, header = output_to_csv(x_tr_jet_valid_mass, y_tr_jet_valid_mass, ids_tr_jet_valid_mass, headers_jet, jet, True, True)
+        all_headers[file_name] = header
 
         # TEST
-        output_to_csv(x_te_jet_invalid_mass, y_te_jet_invalid_mass, ids_te_jet_invalid_mass, headers_jet, jet, False, False)
-        output_to_csv(x_te_jet_valid_mass, y_te_jet_valid_mass, ids_te_jet_valid_mass, headers_jet, jet, False, True)
+        file_name, header = output_to_csv(x_te_jet_invalid_mass, y_te_jet_invalid_mass, ids_te_jet_invalid_mass, headers_jet, jet, False, False)
+        all_headers[file_name] = header
+        file_name, header = output_to_csv(x_te_jet_valid_mass, y_te_jet_valid_mass, ids_te_jet_valid_mass, headers_jet, jet, False, True)
+        all_headers[file_name] = header
+
+    return all_headers
 
 
 def remove_outlier_in_DER_pt_h(y_tr, x_tr, ids_tr, jet):
@@ -227,8 +238,8 @@ def load_processed_data(file_names):
     xs = []
     ids = []
 
-    for i in range(len(file_names)):
-        y, x, id_ = load_csv_data(file_names[i], cut_values=False)
+    for f in file_names:
+        y, x, id_ = load_csv_data(f, cut_values=False)
         ys.append(y)
         xs.append(x)
         ids.append(id_)
@@ -245,7 +256,7 @@ def generate_processed_filenames(isTrain):
     for isMassValid in isMassValids:
         for jet in jets:
             # Generate file name
-            base = './data/train_' if isTrain else './data/test_'
+            base = DATA_PATH + 'train_' if isTrain else DATA_PATH + 'test_'
             valid = '_valid_mass' if isMassValid else '_invalid_mass'
             file_name = base + 'jet_' + str(jet) + valid + '.csv'
             file_names.append(file_name)
@@ -264,21 +275,12 @@ def standardize(x, mean_x=None, std_x=None):
     return x, mean_x, std_x
 
 
-def handle_missing(x, means=None):
-    """Handle NaN data"""
-    if means is None:
-        means = []
-        for i in range(x.shape[1]):
-            nan = (x[:, i] == -999)
-            valid = (x[:, i] != -999)
-            mean_i = np.mean(x[valid, i])
-            x[nan, i] = mean_i
-            means.append(mean_i)
-    else:
-        for i in range(x.shape[1]):
-            nan = (x[:, i] == -999)
-            x[nan, i] = means[i]
-    return x, means
+def log_left_skewed(all_headers, file_names, xs_train):
+    """Log all columns that are left_skewed"""
+    for f, x in zip(file_names, xs_train):
+        header = all_headers[f]
+        col_mask = np.isin(header, LEFT_SKEWED)
+        _ = np.log(x, out=x, where=col_mask)
 
 
 def correlated(y, x, threshold=0):
@@ -506,6 +508,7 @@ def create_csv_submission(ids, y_pred, name):
                y_pred (predicted class labels)
                name (string name of .csv output file to be created)
     """
+    print("Creating csv submission file {}".format(name))
     with open(name, 'w') as csvfile:
         fieldnames = ['Id', 'Prediction']
         writer = csv.DictWriter(csvfile, delimiter=",", fieldnames=fieldnames)
