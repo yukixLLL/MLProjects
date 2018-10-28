@@ -18,8 +18,8 @@ HEADER_PATH = DATA_PATH + "headers.csv"
 def load_data(train_path, test_path):
     print('Split_data_according_to_jet')
     print('Loading files...')
-    y_tr, x_tr, ids_tr = load_csv_data(train_path)
-    y_te, x_te, ids_te = load_csv_data(test_path)
+    y_tr, x_tr, ids_tr, _ = load_csv_data(train_path)
+    y_te, x_te, ids_te, _ = load_csv_data(test_path)
     return y_tr, x_tr, ids_tr, y_te, x_te, ids_te
 
 
@@ -39,6 +39,13 @@ def load_headers(train_path):
 
 def load_csv_data(data_path, sub_sample=False, cut_values=True):
     """Loads data and returns y (class labels), tX (features) and ids (event ids)"""
+    # Load headers
+    with open(data_path, "r") as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        # Remove column id and prediction
+        headers = headers[2:]
+
     y = np.genfromtxt(data_path, delimiter=",", skip_header=1, dtype=str, usecols=1)
     if cut_values:
         print('load_csv_data : dropping uniform distribution values')
@@ -61,7 +68,7 @@ def load_csv_data(data_path, sub_sample=False, cut_values=True):
         input_data = input_data[::50]
         ids = ids[::50]
 
-    return yb, input_data, ids
+    return yb, input_data, ids, headers
 
 
 def save_parameters(lambdas, degrees):
@@ -90,49 +97,6 @@ def read_parameters():
             degrees[row['File']] = row['Degree']
 
     return lambdas, degrees
-
-
-def save_headers(all_headers):
-    """Save the valid headers for each processed file"""
-    print("Saving headers...")
-    fieldnames = ["File"]
-    # The original file has 30 data columns
-    for i in range(30):
-        fieldnames.append('Header {}'.format(i))
-
-    with open(HEADER_PATH, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        data_ = dict.fromkeys(fieldnames)
-        for file, headers in all_headers.items():
-            print("Saving file {}, length of headers: {}".format(file, len(headers)))
-            data_['File'] = file
-            for i, header in enumerate(headers):
-                if header not in data_:
-                    data_['Header {}'.format(i)] = header
-            writer.writerow(data_)
-
-
-def read_headers():
-    """Read the headers for each processed file"""
-    print("Reading headers...")
-    all_headers = dict()
-    with open(HEADER_PATH, 'r') as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            file = row['File']
-            all_headers[file] = []
-            for i in range(30):
-                header_ = row['Header {}'.format(i)]
-                if header_ != "":
-                    all_headers[file].append(header_)
-
-            print("File {}, length of header {}".format(file, len(all_headers[file])))
-
-
-    print("Finished reading headers ! \n{}".format(all_headers))
-    return all_headers
-
 
 
 def output_to_csv(x, y, ids, headers, jet, isTrain, isMassValid):
@@ -246,20 +210,12 @@ def split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te,
         # Save into CSV
         #x, y, ids, headers, jet, isTrain, isMassValid
         # TRAIN
-        file_name, header = output_to_csv(x_tr_jet_invalid_mass, y_tr_jet_invalid_mass, ids_tr_jet_invalid_mass, headers_jet, jet, True, False)
-        all_headers[file_name] = header
-        print("File {}; Header size {}".format(file_name, len(header)))
-        file_name, header = output_to_csv(x_tr_jet_valid_mass, y_tr_jet_valid_mass, ids_tr_jet_valid_mass, headers_jet, jet, True, True)
-        all_headers[file_name] = header
-        print("File {}; Header size {}".format(file_name, len(header)))
+        output_to_csv(x_tr_jet_invalid_mass, y_tr_jet_invalid_mass, ids_tr_jet_invalid_mass, headers_jet, jet, True, False)
+        output_to_csv(x_tr_jet_valid_mass, y_tr_jet_valid_mass, ids_tr_jet_valid_mass, headers_jet, jet, True, True)
 
         # TEST
-        file_name, header = output_to_csv(x_te_jet_invalid_mass, y_te_jet_invalid_mass, ids_te_jet_invalid_mass, headers_jet, jet, False, False)
-        all_headers[file_name] = header
-        print("File {}; Header size {}".format(file_name, len(header)))
-        file_name, header = output_to_csv(x_te_jet_valid_mass, y_te_jet_valid_mass, ids_te_jet_valid_mass, headers_jet, jet, False, True)
-        all_headers[file_name] = header
-        print("File {}; Header size {}".format(file_name, len(header)))
+        output_to_csv(x_te_jet_invalid_mass, y_te_jet_invalid_mass, ids_te_jet_invalid_mass, headers_jet, jet, False, False)
+        output_to_csv(x_te_jet_valid_mass, y_te_jet_valid_mass, ids_te_jet_valid_mass, headers_jet, jet, False, True)
 
     return all_headers
 
@@ -314,14 +270,15 @@ def load_processed_data(file_names):
     ys = dict.fromkeys(file_names)
     xs = dict.fromkeys(file_names)
     ids = dict.fromkeys(file_names)
+    all_headers = dict.fromkeys(file_names)
 
     for f in file_names:
-        y, x, id_ = load_csv_data(f, cut_values=False)
+        y, x, id_, headers = load_csv_data(f, cut_values=False)
         ys[f] = y
         xs[f] = x
         ids[f] = id_
 
-    return ys, xs, ids
+    return ys, xs, ids, all_headers
 
 
 # Read the real files
@@ -349,7 +306,6 @@ def standardize(x, mean_x=None, std_x=None):
     if std_x is None:
         std_x = np.std(x, axis=0)
     x = x / std_x
-    print("Standardize size {}".format(mean_x.shape))
     return x, mean_x, std_x
 
 
