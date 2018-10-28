@@ -9,8 +9,11 @@ import numpy as np
 
 DATA_PATH = "../data/"
 USE_COLS = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 25, 26, 28, 29, 31)
+OUTLIERS = [120, 999, 800, 999]
 LEFT_SKEWED = ['DER_mass_vis', 'DER_mass_jet_jet', 'DER_sum_pt', 'DER_pt_ratio_lep_tau',
               'PRI_tau_pt', 'PRI_lep_pt', 'PRI_met', 'PRI_met_sumet', 'PRI_jet_subleading_pt']
+PARAMETER_PATH = DATA_PATH + "best_parameters.csv"
+HEADER_PATH = DATA_PATH + "headers.csv"
 
 def load_data(train_path, test_path):
     print('Split_data_according_to_jet')
@@ -59,6 +62,77 @@ def load_csv_data(data_path, sub_sample=False, cut_values=True):
         ids = ids[::50]
 
     return yb, input_data, ids
+
+
+def save_parameters(lambdas, degrees):
+    """Save the best parameters got from 4h of cross-validation"""
+    print("Saving best parameters...")
+    with open(PARAMETER_PATH, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=['File', 'Lambda', 'Degree'])
+        writer.writeheader()
+        data_ = dict.fromkeys(['File', 'Lambda', 'Degree'])
+        for file, lambda_, degree_ in zip(lambdas.keys(), lambdas.values(), degrees.values()):
+            data_['Lambda'] = lambda_
+            data_['Degree'] = degree_
+            data_['File'] = file
+            writer.writerow(data_)
+
+
+def read_parameters():
+    """Read the best parameters got from 4h of cross-validation"""
+    print("Reading best parameters...")
+    lambdas = dict()
+    degrees = dict()
+    with open(PARAMETER_PATH, 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            lambdas[row['File']] = row['Lambda']
+            degrees[row['File']] = row['Degree']
+
+    return lambdas, degrees
+
+
+def save_headers(all_headers):
+    """Save the valid headers for each processed file"""
+    print("Saving headers...")
+    fieldnames = ["File"]
+    # The original file has 30 data columns
+    for i in range(30):
+        fieldnames.append('Header {}'.format(i))
+
+    with open(HEADER_PATH, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        data_ = dict.fromkeys(fieldnames)
+        for file, headers in all_headers.items():
+            print("Saving file {}, length of headers: {}".format(file, len(headers)))
+            data_['File'] = file
+            for i, header in enumerate(headers):
+                if header not in data_:
+                    data_['Header {}'.format(i)] = header
+            writer.writerow(data_)
+
+
+def read_headers():
+    """Read the headers for each processed file"""
+    print("Reading headers...")
+    all_headers = dict()
+    with open(HEADER_PATH, 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            file = row['File']
+            all_headers[file] = []
+            for i in range(30):
+                header_ = row['Header {}'.format(i)]
+                if header_ != "":
+                    all_headers[file].append(header_)
+
+            print("File {}, length of header {}".format(file, len(all_headers[file])))
+
+
+    print("Finished reading headers ! \n{}".format(all_headers))
+    return all_headers
+
 
 
 def output_to_csv(x, y, ids, headers, jet, isTrain, isMassValid):
@@ -174,14 +248,18 @@ def split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te,
         # TRAIN
         file_name, header = output_to_csv(x_tr_jet_invalid_mass, y_tr_jet_invalid_mass, ids_tr_jet_invalid_mass, headers_jet, jet, True, False)
         all_headers[file_name] = header
+        print("File {}; Header size {}".format(file_name, len(header)))
         file_name, header = output_to_csv(x_tr_jet_valid_mass, y_tr_jet_valid_mass, ids_tr_jet_valid_mass, headers_jet, jet, True, True)
         all_headers[file_name] = header
+        print("File {}; Header size {}".format(file_name, len(header)))
 
         # TEST
         file_name, header = output_to_csv(x_te_jet_invalid_mass, y_te_jet_invalid_mass, ids_te_jet_invalid_mass, headers_jet, jet, False, False)
         all_headers[file_name] = header
+        print("File {}; Header size {}".format(file_name, len(header)))
         file_name, header = output_to_csv(x_te_jet_valid_mass, y_te_jet_valid_mass, ids_te_jet_valid_mass, headers_jet, jet, False, True)
         all_headers[file_name] = header
+        print("File {}; Header size {}".format(file_name, len(header)))
 
     return all_headers
 
@@ -190,7 +268,6 @@ def remove_outlier_in_DER_pt_h(y_tr, x_tr, ids_tr, jet):
     # Remove the outliers in DER_pt_h (col 3):
     #  JET 0: 2834.999 when the max value is 117.707 outside of outlier - threshold to 120
     #  JET 2: 1053.807 when max value is 734 outside of outlier- Threshold to 800
-    OUTLIERS = [120, 999, 800, 999]
     outlier = OUTLIERS[jet]
     tr_smaller_than_outlier = (x_tr[:, 3] < outlier)
     x_tr = x_tr[tr_smaller_than_outlier]
@@ -234,15 +311,15 @@ def split_data_according_to_mass(x, y, ids):
 
 def load_processed_data(file_names):
     """Load all Train/Test processed data"""
-    ys = []
-    xs = []
-    ids = []
+    ys = dict.fromkeys(file_names)
+    xs = dict.fromkeys(file_names)
+    ids = dict.fromkeys(file_names)
 
     for f in file_names:
         y, x, id_ = load_csv_data(f, cut_values=False)
-        ys.append(y)
-        xs.append(x)
-        ids.append(id_)
+        ys[f] = y
+        xs[f] = x
+        ids[f] = id_
 
     return ys, xs, ids
 
@@ -272,15 +349,17 @@ def standardize(x, mean_x=None, std_x=None):
     if std_x is None:
         std_x = np.std(x, axis=0)
     x = x / std_x
+    print("Standardize size {}".format(mean_x.shape))
     return x, mean_x, std_x
 
 
 def log_left_skewed(all_headers, file_names, xs_train):
     """Log all columns that are left_skewed"""
-    for f, x in zip(file_names, xs_train):
+    for f in file_names:
+        x = xs_train[f]
         header = all_headers[f]
         col_mask = np.isin(header, LEFT_SKEWED)
-        _ = np.log(x, out=x, where=col_mask)
+        _ = np.log(x, out=xs_train[f], where=col_mask)
 
 
 def correlated(y, x, threshold=0):
@@ -443,26 +522,6 @@ def split_data(y, x, ratio, seed=1):
     return y_tr, y_te, x_tr, x_te
 
 
-# def load_csv_data(data_path, sub_sample=False):
-#     """Loads data and returns y (class labels), tX (features) and ids (event ids)"""
-#     y = np.genfromtxt(data_path, delimiter=",", skip_header=1, dtype=str, usecols=1)
-#     x = np.genfromtxt(data_path, delimiter=",", skip_header=1)
-#     ids = x[:, 0].astype(np.int)
-#     input_data = x[:, 2:]
-#
-#     # convert class labels from strings to binary (-1,1)
-#     yb = np.ones(len(y))
-#     yb[np.where(y == 'b')] = -1
-#
-#     # sub-sample
-#     if sub_sample:
-#         yb = yb[::50]
-#         input_data = input_data[::50]
-#         ids = ids[::50]
-#
-#     return yb, input_data, ids
-
-
 def degree_of_accuracy(y, x, w):
     """ return the percentage of right prediction"""
     y_pred = np.dot(x, w)
@@ -486,6 +545,7 @@ def degree_of_accuracy_logitstic(y, x, w):
 
 def predict_labels(weights, data):
     """Generates class predictions given weights, and a test data matrix"""
+    print("Predicting labels - shape of weights: {}, shape of y: {}".format(weights.shape, len(data)))
     y_pred = np.dot(data, weights)
     y_pred[np.where(y_pred <= 0)] = -1
     y_pred[np.where(y_pred > 0)] = 1
