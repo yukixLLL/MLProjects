@@ -76,3 +76,4 @@ def best_param_selection(y, x, degrees, k_fold, lambdas, seed=4):
           format(d=degrees[ind_best], l_te=best_rmses[ind_best], lam=best_lambdas[ind_best], accu=best_accuracy[ind_best]))
 
     return degrees[ind_best], best_lambdas[ind_best], best_rmses[ind_best]
+

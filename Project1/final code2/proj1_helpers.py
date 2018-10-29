@@ -269,6 +269,7 @@ def split_data_according_to_mass(x, y, ids):
 
 def load_processed_data(file_names):
     """Load all Train/Test processed data"""
+    print("Loading processed data...")
     ys = dict.fromkeys(file_names)
     xs = dict.fromkeys(file_names)
     ids = dict.fromkeys(file_names)

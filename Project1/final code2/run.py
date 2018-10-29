@@ -50,11 +50,11 @@ def split_into_8_subset():
     # Flip the eta values if tau's eta is negative
     x_tr, x_te = flip_eta(x_tr, x_te, tau_eta, lep_eta, jet_leading_eta, jet_subleading_eta)
 
+    # FEATURE REDUCTION
     # Split data according to jet number and mass (valid or not)
     split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te, headers)
 
-
-    # first load data
+    # Load preprcessed data
     file_names_train = generate_processed_filenames(isTrain=True)
     ys_train, xs_train, ids_train, train_headers = load_processed_data(file_names_train)
 
@@ -77,16 +77,31 @@ def split_into_8_subset():
     # build w using ridge regression
     k_fold = 10
     #degrees = np.arange(4, 13)
-    degrees = np.arange(4, 5)
-    #lambdas = np.logspace(-20, -3, 100)
-    lambdas = np.logspace(-20, -3, 1)
+    degrees = dict({'../data/train_jet_0_valid_mass.csv': 12,
+                  '../data/train_jet_1_valid_mass.csv': [11, 12],
+                  '../data/train_jet_2_valid_mass.csv': 12,
+                  '../data/train_jet_3_valid_mass.csv': 12,
+                  '../data/train_jet_0_invalid_mass.csv': 10,
+                  '../data/train_jet_1_invalid_mass.csv': 4,
+                  '../data/train_jet_2_invalid_mass.csv': 4,
+                  '../data/train_jet_3_invalid_mass.csv': [4, 5]})
+    lambdas = np.logspace(-20, -3, 100)
     seed = 12
+
+    # for f in file_names_train:
+    #     print("Training for {}".format(f))
+    #     tx = x_standardized[f]
+    #     y = ys_train[f]
+    #     best_degree, best_lambda_, _ = best_param_selection(y, tx, degrees, k_fold, lambdas, seed)
+    #     degrees_jet[f] = best_degree
+    #     lambdas_jet[f] = best_lambda_
 
     for f in file_names_train:
         print("Training for {}".format(f))
         tx = x_standardized[f]
         y = ys_train[f]
-        best_degree, best_lambda_, _ = best_param_selection(y, tx, degrees, k_fold, lambdas, seed)
+        degree = degrees[f]
+        best_degree, best_lambda_, _ = best_param_selection(y, tx, degree, k_fold, lambdas, seed)
         degrees_jet[f] = best_degree
         lambdas_jet[f] = best_lambda_
 
