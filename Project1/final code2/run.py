@@ -77,13 +77,13 @@ def split_into_8_subset():
     # build w using ridge regression
     k_fold = 10
     #degrees = np.arange(4, 13)
-    degrees = dict({'../data/train_jet_0_valid_mass.csv': 12,
+    degrees = dict({'../data/train_jet_0_valid_mass.csv': [12],
                   '../data/train_jet_1_valid_mass.csv': [11, 12],
-                  '../data/train_jet_2_valid_mass.csv': 12,
-                  '../data/train_jet_3_valid_mass.csv': 12,
-                  '../data/train_jet_0_invalid_mass.csv': 10,
-                  '../data/train_jet_1_invalid_mass.csv': 4,
-                  '../data/train_jet_2_invalid_mass.csv': 4,
+                  '../data/train_jet_2_valid_mass.csv': [12],
+                  '../data/train_jet_3_valid_mass.csv': [12],
+                  '../data/train_jet_0_invalid_mass.csv': [10],
+                  '../data/train_jet_1_invalid_mass.csv': [4],
+                  '../data/train_jet_2_invalid_mass.csv': [4],
                   '../data/train_jet_3_invalid_mass.csv': [4, 5]})
     lambdas = np.logspace(-20, -3, 100)
     seed = 12
