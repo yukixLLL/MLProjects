@@ -2,16 +2,16 @@
 
 ## File Description:
 
-`run.py` : Prediction code including all the processes we use to reach the accuracy corresponding to Kaggle Leaderboard, including data pre-processing, cross-validation,etc.<br/>
+`run.py` : Prediction code including all the processes we use to reach the accuracy corresponding to Kaggle Leaderboard, including data preprocessing, cross-validation,etc.<br/>
 
-`Implementation.py` : The implementation of six machine learning models which includes:
-Gradient Descent, Stochastic Gradient Descent, Least Sqaure, Ridge Regression, Logistic Regression, Regularized Logistic Regression.<br/>
+`Implementation.py` : The implementation of six machine learning models which includes
+Gradient Descent, Stochastic Gradient Descent, Least Sqaure, Ridge Regression, Logistic Regression and Regularized Logistic Regression.<br/>
 
 `proj1_helpers.py` : This file includes detailed functions related to run.py, such as load_data(), angle_processing(), etc.<br/>
 
 `cross_validation.py` : cross-validation implementation including the function to choose the best hyperparameters.<br/>
 
-`test_methods.py` : The initial test of six models without any data pre-processing.<br/>
+`test_methods.py` : The initial test of six models without any data preprocessing.<br/>
 
 ## Method General Description:
 (Detailed description can be seen in the report)<br/>
