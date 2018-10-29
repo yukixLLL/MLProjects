@@ -16,7 +16,7 @@ Gradient Descent, Stochastic Gradient Descent, Least Sqaure, Ridge Regression, L
 ## Method General Description:
 (Detailed description can be seen in the report)<br/>
 ### Model: Ridge Regression
-### Data Pre-processing :
+### Data Preprocessing :
 (All detailed function can be seen in `proj1_helpers.py`)
 1. Angle feature augmentation using formula in the official document
 2. Drop uniform distribution variables
