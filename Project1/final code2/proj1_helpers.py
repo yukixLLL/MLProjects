@@ -10,13 +10,13 @@ import numpy as np
 DATA_PATH = "../data/"
 USE_COLS = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 25, 26, 28, 29, 31)
 OUTLIERS = [120, 999, 800, 999]
+ANGLE_COLS=(16,17,19,20,26,27,29,30)
 LEFT_SKEWED = ['DER_mass_vis', 'DER_mass_jet_jet', 'DER_sum_pt', 'DER_pt_ratio_lep_tau',
               'PRI_tau_pt', 'PRI_lep_pt', 'PRI_met', 'PRI_met_sumet', 'PRI_jet_subleading_pt']
 PARAMETER_PATH = DATA_PATH + "best_parameters.csv"
-HEADER_PATH = DATA_PATH + "headers.csv"
+
 
 def load_data(train_path, test_path):
-    print('Split_data_according_to_jet')
     print('Loading files...')
     y_tr, x_tr, ids_tr, _ = load_csv_data(train_path)
     y_te, x_te, ids_te, _ = load_csv_data(test_path)
@@ -48,7 +48,7 @@ def load_csv_data(data_path, sub_sample=False, cut_values=True):
 
     y = np.genfromtxt(data_path, delimiter=",", skip_header=1, dtype=str, usecols=1)
     if cut_values:
-        print('load_csv_data : dropping uniform distribution values')
+        print('Loading {} : dropping uniform distribution values'.format(data_path))
         # drop Pri_tau_phi(17), Pri_lep_phi(20), Pri_met_phi(22), Pri_jet_leading_Phi(27), Pri_jet_subleading_phi(30)
         # because of uniform distribution
         x = np.genfromtxt(data_path, delimiter=",", skip_header=1, usecols=USE_COLS)
@@ -136,10 +136,10 @@ def output_to_csv(x, y, ids, headers, jet, isTrain, isMassValid):
 
 
 def split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te, headers):
+    """Clean the train and test data by according to the jet num and """
     print("The shape of x_tr: ", x_tr.shape)
     print("The shape of x_te: ", x_te.shape)
     # Save the headers of each csv files for later use
-    all_headers = dict()
     for jet in range(4):
         print("\n\nSplitting both train and test data for jet {}, remove the col PRI_jet_num".format(jet))
         # PRI_jet_num (24 -> 24 - 3 cols dropped before 24 - 2 cols (id, label) = col 19)
@@ -174,11 +174,15 @@ def split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te,
         # Remove col PRI_jet_all_pt from x because it only contains 0 values
         if jet == 0:
             print("remove col Pri_jet_all_pt both for train and test set in jet{}".format(jet))
-            x_tr_jet = np.delete(x_tr_jet, -1, axis=1)
-            x_te_jet = np.delete(x_te_jet, -1, axis=1)
+            all_pt = np.where(headers_jet == 'PRI_jet_all_pt')
+            print("The header at {all_pt} is {h}".format(all_pt=all_pt, h=headers_jet[all_pt]))
+            print(x_te_jet[0][all_pt])
+            x_tr_jet = np.delete(x_tr_jet, all_pt, axis=1)
+            x_te_jet = np.delete(x_te_jet, all_pt, axis=1)
+            print(x_te_jet)
+            headers_jet = np.delete(headers_jet, all_pt)
             print("The shape of x_tr_jet{j} after delete col Pri_jet_all_pt: {shape}".format(j=jet, shape=x_tr_jet.shape))
             print("The shape of x_te_jet{j} after delete col Pri_jet_all_pt: {shape}\n".format(j=jet, shape=x_te_jet.shape))
-            headers_jet = np.delete(headers_jet, -1)
         
         # Remove all the columns with only NaN values
         print("Remove all the columns with only NaN values for both train and test data.")
@@ -216,8 +220,6 @@ def split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te,
         # TEST
         output_to_csv(x_te_jet_invalid_mass, y_te_jet_invalid_mass, ids_te_jet_invalid_mass, headers_jet, jet, False, False)
         output_to_csv(x_te_jet_valid_mass, y_te_jet_valid_mass, ids_te_jet_valid_mass, headers_jet, jet, False, True)
-
-    return all_headers
 
 
 def remove_outlier_in_DER_pt_h(y_tr, x_tr, ids_tr, jet):
@@ -343,6 +345,144 @@ def feature_cross_prod(x, corr_ind):
     prod_x = np.asarray(prod_x)
     return prod_x.T
 
+"""---------------HELPER FUNCTIONS FOR FEATURE AUGMENTATION ON ANGLES---------------"""
+
+
+def angle_abs_sub(ag1,ag2):
+    if (ag1==-999)| (ag2==-999):
+        return -999
+    return np.abs(ag1 - ag2)
+
+
+def eta_prod(eta1,eta2):
+    if ((eta1==-999)|(eta2==-999)):
+        return -999
+    return eta1 * eta2
+
+
+def deltaphi_in_pars(phi1,phi2):
+    if ((phi1==-999)|(phi2==-999)):
+        return -999
+    deltaphi=angle_abs_sub(phi1,phi2)
+    if deltaphi > np.pi:
+        deltaphi=2*np.pi-deltaphi
+    return deltaphi
+
+def load_csv_angle_data(data_path):
+    """Load only the angle columns"""
+    print("Loading angle data from {}".format(data_path))
+    x = np.genfromtxt(data_path, delimiter=",", skip_header=1, usecols=ANGLE_COLS)
+    return x
+
+def find_eta_index(headers):
+    """Find all the eta col index in headers"""
+    tau_eta = np.where(headers=='PRI_tau_eta')
+    lep_eta = np.where(headers=='PRI_lep_eta')
+    jet_leading_eta = np.where(headers=='PRI_jet_leading_eta')
+    jet_subleading_eta = np.where(headers=='PRI_jet_subleading_eta')
+    #check result
+    print("The index of tau_eta is: {i}".format(i=tau_eta))
+    print("The index of lep_eta is: {i}".format(i=lep_eta))
+    print("The index of jet_leading_eta is: {i}".format(i=jet_leading_eta))
+    print("The index of jet_subleading_eta is: {i}".format(i=jet_subleading_eta))
+    return tau_eta,lep_eta,jet_leading_eta,jet_subleading_eta
+
+
+def flip_eta(x_tr, x_te, tau_eta,lep_eta,jet_leading_eta,jet_subleading_eta):
+    """flip the values of eta if tar's eta is negative"""
+    for ind, x in enumerate(x_tr):
+        if ((x[tau_eta] != -999) & (x[tau_eta] < 0)):
+            x_tr[ind][tau_eta] = (-1) * x[tau_eta]
+            if (x[lep_eta] != -999):
+                x_tr[ind][lep_eta] = (-1) * x[lep_eta]
+            if (x[jet_leading_eta] != -999):
+                x_tr[ind][jet_leading_eta] = (-1) * x[jet_leading_eta]
+            if (x[jet_subleading_eta] != -999):
+                x_tr[ind][jet_subleading_eta] = (-1) * x[jet_subleading_eta]
+    for ind, x in enumerate(x_te):
+        if ((x[tau_eta] != -999) & (x[tau_eta] < 0)):
+            x_te[ind][tau_eta] = (-1) * x[tau_eta]
+            if (x[lep_eta] != -999):
+                x_te[ind][lep_eta] = (-1) * x[lep_eta]
+            if (x[jet_leading_eta] != -999):
+                x_te[ind][jet_leading_eta] = (-1) * x[jet_leading_eta]
+            if (x[jet_subleading_eta] != -999):
+                x_te[ind][jet_subleading_eta] = (-1) * x[jet_subleading_eta]
+
+    return x_tr, x_te
+
+
+def process_angle_data(data):
+    """Angle augmentation using method found in Higgs Boson Kaggle competition. Details will be discussed in report"""
+    deltaeta_tau_lep = []
+    deltaeta_tau_jet1 = []
+    deltaeta_tau_jet2 = []
+    deltaeta_lep_jet1 = []
+    deltaeta_lep_jet2 = []
+    deltaeta_jet1_jet2 = []
+    prodeta_tau_lep = []
+    prodeta_tau_jet1 = []
+    prodeta_tau_jet2 = []
+    prodeta_lep_jet1 = []
+    prodeta_lep_jet2 = []
+    prodeta_jet1_jet2 = []
+    deltaphi_tau_lep = []
+    deltaphi_tau_jet1 = []
+    deltaphi_tau_jet2 = []
+    deltaphi_lep_jet1 = []
+    deltaphi_lep_jet2 = []
+    deltaphi_jet1_jet2 = []
+    for ind, x in enumerate(data):
+        if x[0] < 0:
+            for i in np.arange(0, 7, 2):
+                if x[i] != -999:
+                    x[i] = (-1) * x[i]
+
+        deltaeta_tau_lep.append(angle_abs_sub(x[0], x[2]))
+        deltaeta_tau_jet1.append(angle_abs_sub(x[0], x[4]))
+        deltaeta_tau_jet2.append(angle_abs_sub(x[0], x[6]))
+        deltaeta_lep_jet1.append(angle_abs_sub(x[2], x[4]))
+        deltaeta_lep_jet2.append(angle_abs_sub(x[2], x[6]))
+        deltaeta_jet1_jet2.append(angle_abs_sub(x[4], x[6]))
+        prodeta_tau_lep.append(eta_prod(x[0], x[2]))
+        prodeta_tau_jet1.append(eta_prod(x[0], x[4]))
+        prodeta_tau_jet2.append(eta_prod(x[0], x[6]))
+        prodeta_lep_jet1.append(eta_prod(x[2], x[4]))
+        prodeta_lep_jet2.append(eta_prod(x[2], x[6]))
+        prodeta_jet1_jet2.append(eta_prod(x[4], x[6]))
+        deltaphi_tau_lep.append(deltaphi_in_pars(x[1], x[3]))
+        deltaphi_tau_jet1.append(deltaphi_in_pars(x[1], x[5]))
+        deltaphi_tau_jet2.append(deltaphi_in_pars(x[1], x[7]))
+        deltaphi_lep_jet1.append(deltaphi_in_pars(x[3], x[5]))
+        deltaphi_lep_jet2.append(deltaphi_in_pars(x[3], x[7]))
+        deltaphi_jet1_jet2.append(deltaphi_in_pars(x[5], x[7]))
+
+    list_angle_trans = []
+    list_angle_trans.append(deltaeta_tau_lep)
+    list_angle_trans.append(deltaeta_tau_jet1)
+    list_angle_trans.append(deltaeta_tau_jet2)
+    list_angle_trans.append(deltaeta_lep_jet1)
+    list_angle_trans.append(deltaeta_lep_jet2)
+    list_angle_trans.append(deltaeta_jet1_jet2)
+    list_angle_trans.append(prodeta_tau_lep)
+    list_angle_trans.append(prodeta_tau_jet1)
+    list_angle_trans.append(prodeta_tau_jet2)
+    list_angle_trans.append(prodeta_lep_jet1)
+    list_angle_trans.append(prodeta_lep_jet2)
+    list_angle_trans.append(prodeta_jet1_jet2)
+    list_angle_trans.append(deltaphi_tau_lep)
+    list_angle_trans.append(deltaphi_tau_jet1)
+    list_angle_trans.append(deltaphi_tau_jet2)
+    list_angle_trans.append(deltaphi_lep_jet1)
+    list_angle_trans.append(deltaphi_lep_jet2)
+    list_angle_trans.append(deltaphi_jet1_jet2)
+    return list_angle_trans
+
+
+def shape_feature_columns(list_angle_trans):
+    """Shape the angle list to a numpy column"""
+    angle_trans_arr=np.asarray(list_angle_trans).T
+    return angle_trans_arr
 
 """---------------HELPER FUNCTIONS FOR LEAST SQUARES GD---------------"""
 

@@ -5,6 +5,12 @@ from cross_validation import *
 
 TRAIN_PATH = "../data/train.csv"
 TEST_PATH = "../data/test.csv"
+SUBMISSION_PATH = "swimming.csv"
+HEADER_ADD_FEATURES = ['deltaeta_tau_lep', 'deltaeta_tau_jet1', 'deltaeta_tau_jet2', 'deltaeta_lep_jet1',
+                       'deltaeta_lep_jet2', 'deltaeta_jet1_jet2', 'prodeta_tau_lep', 'prodeta_tau_jet1',
+                       'prodeta_tau_jet2', 'prodeta_lep_jet1', 'prodeta_lep_jet2', 'prodeta_jet1_jet2',
+                       'deltaphi_tau_lep', 'deltaphi_tau_jet1', 'deltaphi_tau_jet2', 'deltaphi_lep_jet1',
+                       'deltaphi_lep_jet2', 'deltaphi_jet1_jet2']
 
 def main():
      split_into_8_subset()
@@ -12,14 +18,46 @@ def main():
 
 def split_into_8_subset():
     # data pre-processing
+    # Feature augmentation using angles
+    # Training
+    angle_data=load_csv_angle_data(TRAIN_PATH)
+    list_angle_trans=process_angle_data(angle_data)
+    angle_trans_tr_arr=shape_feature_columns(list_angle_trans)
+    print("Finished angle augmentation for Train! Shape: {}".format(angle_trans_tr_arr.shape))
+
+    # Test
+    angle_data = load_csv_angle_data(TEST_PATH)
+    list_angle_trans = process_angle_data(angle_data)
+    angle_trans_te_arr = shape_feature_columns(list_angle_trans)
+    print("Finished angle augmentation for Test! Shape: {}".format(angle_trans_te_arr.shape))
+
+    # Load data to apply changes
     y_tr, x_tr, ids_tr, y_te, x_te, ids_te = load_data(TRAIN_PATH, TEST_PATH)
+
+    # Concatenate features
+    x_tr = np.concatenate((x_tr, angle_trans_tr_arr), axis=1)
+    x_te = np.concatenate((x_te, angle_trans_te_arr), axis=1)
+    print("Finished concatenating features! Train Shape: {}; Test shape: {}".format(x_tr.shape, x_te.shape))
+
+    # Concatenate headers
     headers = load_headers(TRAIN_PATH)
+    headers = np.concatenate((headers, HEADER_ADD_FEATURES))
+    print("Finished concatenating headers! Headers are: {}".format(headers))
+
+    # find the index of etas according to the index of headers
+    tau_eta, lep_eta, jet_leading_eta, jet_subleading_eta = find_eta_index(headers)
+
+    # Flip the eta values if tau's eta is negative
+    x_tr, x_te = flip_eta(x_tr, x_te, tau_eta, lep_eta, jet_leading_eta, jet_subleading_eta)
+
+    # Split data according to jet number and mass (valid or not)
     split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te, headers)
 
-    # start training
+
     # first load data
     file_names_train = generate_processed_filenames(isTrain=True)
     ys_train, xs_train, ids_train, train_headers = load_processed_data(file_names_train)
+
 
     # Standandize xs
     x_means = dict.fromkeys(file_names_train)
@@ -37,10 +75,12 @@ def split_into_8_subset():
     lambdas_jet = dict.fromkeys(file_names_train)
 
     # build w using ridge regression
-    k_fold = 4
-    degrees = np.arange(4, 13)
-    lambdas = np.logspace(-20, -3, 100)
-    seed = 1
+    k_fold = 10
+    #degrees = np.arange(4, 13)
+    degrees = np.arange(4, 5)
+    #lambdas = np.logspace(-20, -3, 100)
+    lambdas = np.logspace(-20, -3, 1)
+    seed = 12
 
     for f in file_names_train:
         print("Training for {}".format(f))
@@ -89,7 +129,7 @@ def split_into_8_subset():
     log_left_skewed(test_headers, file_names_test, xs_test)
 
     idds, yys = predict(xs_test, ids_test, x_means, x_stds, degrees_jet, weights, file_names_train, file_names_test)
-    create_csv_submission(idds, yys, "swimming.csv")
+    create_csv_submission(idds, yys, SUBMISSION_PATH)
     print("File creation success!")
 
 
