@@ -3,8 +3,8 @@
 from implementation import *
 from cross_validation import *
 
-TRAIN_PATH = "../data/train.csv"
-TEST_PATH = "../data/test.csv"
+TRAIN_PATH = "./data/train.csv"
+TEST_PATH = "./data/test.csv"
 SUBMISSION_PATH = "swimming.csv"
 HEADER_ADD_FEATURES = ['deltaeta_tau_lep', 'deltaeta_tau_jet1', 'deltaeta_tau_jet2', 'deltaeta_lep_jet1',
                        'deltaeta_lep_jet2', 'deltaeta_jet1_jet2', 'prodeta_tau_lep', 'prodeta_tau_jet1',
@@ -12,11 +12,8 @@ HEADER_ADD_FEATURES = ['deltaeta_tau_lep', 'deltaeta_tau_jet1', 'deltaeta_tau_je
                        'deltaphi_tau_lep', 'deltaphi_tau_jet1', 'deltaphi_tau_jet2', 'deltaphi_lep_jet1',
                        'deltaphi_lep_jet2', 'deltaphi_jet1_jet2']
 
+
 def main():
-     split_into_8_subset()
-
-
-def split_into_8_subset():
     # data pre-processing
     # Feature augmentation using angles
     # Training
@@ -76,32 +73,15 @@ def split_into_8_subset():
 
     # build w using ridge regression
     k_fold = 10
-    #degrees = np.arange(4, 13)
-    degrees = dict({'../data/train_jet_0_valid_mass.csv': [12],
-                  '../data/train_jet_1_valid_mass.csv': [11, 12],
-                  '../data/train_jet_2_valid_mass.csv': [12],
-                  '../data/train_jet_3_valid_mass.csv': [12],
-                  '../data/train_jet_0_invalid_mass.csv': [10],
-                  '../data/train_jet_1_invalid_mass.csv': [4],
-                  '../data/train_jet_2_invalid_mass.csv': [4],
-                  '../data/train_jet_3_invalid_mass.csv': [4, 5]})
+    degrees = np.arange(4, 13)
     lambdas = np.logspace(-20, -3, 100)
     seed = 12
-
-    # for f in file_names_train:
-    #     print("Training for {}".format(f))
-    #     tx = x_standardized[f]
-    #     y = ys_train[f]
-    #     best_degree, best_lambda_, _ = best_param_selection(y, tx, degrees, k_fold, lambdas, seed)
-    #     degrees_jet[f] = best_degree
-    #     lambdas_jet[f] = best_lambda_
 
     for f in file_names_train:
         print("Training for {}".format(f))
         tx = x_standardized[f]
         y = ys_train[f]
-        degree = degrees[f]
-        best_degree, best_lambda_, _ = best_param_selection(y, tx, degree, k_fold, lambdas, seed)
+        best_degree, best_lambda_, _ = best_param_selection(y, tx, degrees, k_fold, lambdas, seed)
         degrees_jet[f] = best_degree
         lambdas_jet[f] = best_lambda_
 
@@ -149,6 +129,7 @@ def split_into_8_subset():
 
 
 def predict(xs_test, ids_test, x_means, x_stds, degrees, weights, file_names_train, file_names_test):
+    """Predict the labels with trained weights and test data"""
     print("Predicting...")
     ids = []
     y_preds = []

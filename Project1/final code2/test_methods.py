@@ -1,7 +1,7 @@
 from implementation import *
 from cross_validation import *
 
-TRAIN_PATH = "../data/train.csv"
+TRAIN_PATH = "./data/train.csv"
 
 
 def main():

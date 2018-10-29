@@ -5,9 +5,7 @@ import csv
 import numpy as np
 
 
-"""---------------DATA PRE-PROCESSING FUNCTION---------------"""
-
-DATA_PATH = "../data/"
+DATA_PATH = "./data/"
 USE_COLS = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 21, 23, 24, 25, 26, 28, 29, 31)
 OUTLIERS = [120, 999, 800, 999]
 ANGLE_COLS=(16,17,19,20,26,27,29,30)
@@ -15,8 +13,10 @@ LEFT_SKEWED = ['DER_mass_vis', 'DER_mass_jet_jet', 'DER_sum_pt', 'DER_pt_ratio_l
               'PRI_tau_pt', 'PRI_lep_pt', 'PRI_met', 'PRI_met_sumet', 'PRI_jet_subleading_pt']
 PARAMETER_PATH = DATA_PATH + "best_parameters.csv"
 
+"""---------------HELPER FUNCTIONS FOR LOADING DATA---------------"""
 
 def load_data(train_path, test_path):
+    """Load all the unprocessed data from the train and test path"""
     print('Loading files...')
     y_tr, x_tr, ids_tr, _ = load_csv_data(train_path)
     y_te, x_te, ids_te, _ = load_csv_data(test_path)
@@ -35,6 +35,12 @@ def load_headers(train_path):
     headers = headers[2:]
 
     return headers
+
+def load_csv_angle_data(data_path):
+    """Load only the angle columns of the file"""
+    print("Loading angle data from {}".format(data_path))
+    x = np.genfromtxt(data_path, delimiter=",", skip_header=1, usecols=ANGLE_COLS)
+    return x
 
 
 def load_csv_data(data_path, sub_sample=False, cut_values=True):
@@ -99,10 +105,42 @@ def read_parameters():
     return lambdas, degrees
 
 
+def load_processed_data(file_names):
+    """Load all Train/Test processed data"""
+    print("Loading processed data...")
+    ys = dict.fromkeys(file_names)
+    xs = dict.fromkeys(file_names)
+    ids = dict.fromkeys(file_names)
+    all_headers = dict.fromkeys(file_names)
+
+    for f in file_names:
+        y, x, id_, headers = load_csv_data(f, cut_values=False)
+        ys[f] = y
+        xs[f] = x
+        ids[f] = id_
+
+    return ys, xs, ids, all_headers
+
+
+def generate_processed_filenames(isTrain):
+    """Generate the processed filenames"""
+    file_names = []
+    isMassValids = [True, False]
+    jets = range(4)
+
+    for isMassValid in isMassValids:
+        for jet in jets:
+            # Generate file name
+            base = DATA_PATH + 'train_' if isTrain else DATA_PATH + 'test_'
+            valid = '_valid_mass' if isMassValid else '_invalid_mass'
+            file_name = base + 'jet_' + str(jet) + valid + '.csv'
+            file_names.append(file_name)
+
+    return file_names
+
+
 def output_to_csv(x, y, ids, headers, jet, isTrain, isMassValid):
-    """
-    Write data into new csv file
-    """
+    """Write data into new csv file"""
     # Add 'Id' & 'Prediction' to headers
     headers = np.insert(headers, 0, ['Id', 'Prediction'])
 
@@ -133,6 +171,9 @@ def output_to_csv(x, y, ids, headers, jet, isTrain, isMassValid):
             writer.writerow(data_)
 
     return file_name, headers[2:]
+
+
+"""---------------HELPER FUNCTIONS FOR CLEANING AND SPLITTING DATA---------------"""
 
 
 def split_data_according_to_jet_and_mass(y_tr, x_tr, ids_tr, y_te, x_te, ids_te, headers):
@@ -267,38 +308,7 @@ def split_data_according_to_mass(x, y, ids):
     return x_invalid_mass, x_valid_mass, y_invalid_mass, y_valid_mass, ids_invalid_mass, ids_valid_mass
 
 
-def load_processed_data(file_names):
-    """Load all Train/Test processed data"""
-    print("Loading processed data...")
-    ys = dict.fromkeys(file_names)
-    xs = dict.fromkeys(file_names)
-    ids = dict.fromkeys(file_names)
-    all_headers = dict.fromkeys(file_names)
-
-    for f in file_names:
-        y, x, id_, headers = load_csv_data(f, cut_values=False)
-        ys[f] = y
-        xs[f] = x
-        ids[f] = id_
-
-    return ys, xs, ids, all_headers
-
-
-# Read the real files
-def generate_processed_filenames(isTrain):
-    file_names = []
-    isMassValids = [True, False]
-    jets = range(4)
-
-    for isMassValid in isMassValids:
-        for jet in jets:
-            # Generate file name
-            base = DATA_PATH + 'train_' if isTrain else DATA_PATH + 'test_'
-            valid = '_valid_mass' if isMassValid else '_invalid_mass'
-            file_name = base + 'jet_' + str(jet) + valid + '.csv'
-            file_names.append(file_name)
-
-    return file_names
+"""---------------HELPER FUNCTIONS FOR TRANSFORMING DATA---------------"""
 
 
 def standardize(x, mean_x=None, std_x=None):
@@ -321,47 +331,25 @@ def log_left_skewed(all_headers, file_names, xs_train):
         _ = np.log(x, out=xs_train[f], where=col_mask)
 
 
-def correlated(y, x, threshold=0):
-    """
-    compute the correlation between with each feature
-    return the index of the feature with correlation bigger than threshold
-    """
-    print('y shape', y.shape)
-    cor = np.corrcoef(y.T, x.T)
-    corr_degree = cor[0, 1:]
-    print("All correlation\n", corr_degree)
-    select_corr = corr_degree[np.abs(corr_degree) >= threshold]
-    print("select_correlation\n", select_corr)
-    sorted_index = np.argsort(np.abs(corr_degree))[::-1]
-    print("sorted_index\n", sorted_index[:len(select_corr)])
-    return sorted_index[:len(select_corr)]
-
-
-def feature_cross_prod(x, corr_ind):
-    prod_x = []
-    for i in range(len(corr_ind)):
-        for j in range(i+1, len(corr_ind)):
-            m = x[:, corr_ind[i]] * x[:, corr_ind[j]]
-            prod_x.append(m)
-    prod_x = np.asarray(prod_x)
-    return prod_x.T
-
-"""---------------HELPER FUNCTIONS FOR FEATURE AUGMENTATION ON ANGLES---------------"""
+"""---------------HELPER FUNCTIONS FOR FEATURE AUGMENTATION USING ANGLES---------------"""
 
 
 def angle_abs_sub(ag1,ag2):
+    """Return the absolute value of the difference between 2 angles"""
     if (ag1==-999)| (ag2==-999):
         return -999
     return np.abs(ag1 - ag2)
 
 
 def eta_prod(eta1,eta2):
+    """Return the product of two eta angles"""
     if ((eta1==-999)|(eta2==-999)):
         return -999
     return eta1 * eta2
 
 
 def deltaphi_in_pars(phi1,phi2):
+    """Return the absolute value of the difference of two phi angles. The returned value should be between 0 and pi"""
     if ((phi1==-999)|(phi2==-999)):
         return -999
     deltaphi=angle_abs_sub(phi1,phi2)
@@ -369,11 +357,6 @@ def deltaphi_in_pars(phi1,phi2):
         deltaphi=2*np.pi-deltaphi
     return deltaphi
 
-def load_csv_angle_data(data_path):
-    """Load only the angle columns"""
-    print("Loading angle data from {}".format(data_path))
-    x = np.genfromtxt(data_path, delimiter=",", skip_header=1, usecols=ANGLE_COLS)
-    return x
 
 def find_eta_index(headers):
     """Find all the eta col index in headers"""
@@ -485,6 +468,7 @@ def shape_feature_columns(list_angle_trans):
     angle_trans_arr=np.asarray(list_angle_trans).T
     return angle_trans_arr
 
+
 """---------------HELPER FUNCTIONS FOR LEAST SQUARES GD---------------"""
 
 
@@ -511,9 +495,6 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     Takes as input two iterables (here the output desired values 'y' and the input data 'tx')
     Outputs an iterator which gives mini-batches of `batch_size` matching elements from `y` and `tx`.
     Data can be randomly shuffled to avoid ordering in the original data messing with the randomness of the minibatches.
-    Example of use :
-    for minibatch_y, minibatch_tx in batch_iter(y, tx, 32):
-        <DO-SOMETHING>
     """
     data_size = len(y)
 
@@ -541,7 +522,9 @@ def build_poly(x, degree):
         poly = np.c_[poly, np.power(x, deg)]
     return poly
 
+
 """---------------HELPER FUNCTIONS FOR LOGSITC REGRESSION---------------"""
+
 
 def data_preprocess_logsitic(y_tr,x_tr,x_te=None,y_te=None,state='pred'):
     """
@@ -558,6 +541,7 @@ def data_preprocess_logsitic(y_tr,x_tr,x_te=None,y_te=None,state='pred'):
     
     
     return y_tr,x_tr,y_te,x_te
+
 
 def data_postprocess_logistic(y_pred):
     """change 0 label into 1 to fit the prediction"""
@@ -659,12 +643,7 @@ def predict_labels_logistic(weights, data):
     return y_pred
 
 def create_csv_submission(ids, y_pred, name):
-    """
-    Creates an output file in csv format for submission to kaggle
-    Arguments: ids (event ids associated with each prediction)
-               y_pred (predicted class labels)
-               name (string name of .csv output file to be created)
-    """
+    """Creates an output file in csv format for submission to kaggle"""
     print("Creating csv submission file {}".format(name))
     with open(name, 'w') as csvfile:
         fieldnames = ['Id', 'Prediction']
