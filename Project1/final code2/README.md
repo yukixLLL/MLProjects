@@ -22,6 +22,6 @@ cross_validation.py : cross-validation implementation including the function to 
 1. Angle feature augmentation using formula in the official document
 2. Drop uniform distribution variables
 3. Split data into 8 groups according to PRI_jet_num and DER_mass_MMC and drop undefined values(-999) in each group
-4. Apply log operation on the left-skewed distribution feature.
+4. Apply log operation on the Right-skewed distribution feature.
 ### Cross-validation : Based on best accuracy
 
