@@ -21,7 +21,8 @@ All the scripts are written with Python 3.6. Here are the instructions to run th
 2. Place `train.csv` and `test.csv` in the data folder. If you want to place these data sheets elsewhere, you need to change the variables `TRAIN_PATH` and `TEST_PATH` in `projet1_helpers.py`, `test_methods.py`, `run.py`.
 3. To test our 6 models run test_methods.py with `python test_methods.py`
 4. To run the algorithm that produced our best accuracy, run  `python run.py`. This may take up to 12 hours depending on the quality of the machine.
-5. The output `swimming.csv` will be produced in this current folder.
+5. If you want to import the function from `run.py` in a python script, you need to import the function `main()`.
+6. The output `swimming.csv` will be produced in this current folder.
 
 ## Method General Description:
 (Detailed description can be seen in the report)<br/>
