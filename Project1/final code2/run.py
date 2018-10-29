@@ -113,30 +113,5 @@ def predict(xs_test, ids_test, x_means, x_stds, degrees, weights, file_names_tra
     return ids, y_preds
 
 
-def logistic_without_data_preprocessing():
-    """logistic regression without data pre-processing"""
-    y, x, ids = load_csv_data(TRAIN_PATH, sub_sample=False)
-    x, mean_x, std_x = standardize(x)
-    print("shape of x {x} shape of y {y}".format(x=x.shape, y=y.shape))
-    y_test, x_test, ids_test = load_csv_data(TEST_PATH, sub_sample=False)
-    x_test, _, _ = standardize(x_test, mean_x, std_x)
-
-    #pre-process data
-    y_train,tx_train=build_model_data(y,x)
-    y_test,tx_test=build_model_data(y_test,x_test)
-    y_train,_,_,_=data_preprocess_logsitic(y_train,tx_train,tx_test,y_test)
-    #initial parameters
-    max_iters_log = 2000
-    gamma_log = 1e-6
-    initial_w_log = np.zeros((tx_train.shape[1]))
-    
-    #get the weight and the loss of training data
-    log_w,log_loss = logistic_regression(y_train,tx_train,initial_w_log,max_iters_log,gamma_log)
-
-    # use the trained weight to get the prediction result
-    y_pred = predict_labels_logistic(log_w, tx_test)
-    create_csv_submission(ids_test, y_pred, "logistic_regression_predit.csv")
-
-
 if __name__ == "__main__":
     main()
