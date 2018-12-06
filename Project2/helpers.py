@@ -7,8 +7,8 @@ def load_dataset(path):
     parsed_df = pd.DataFrame()
     # Get all pairs of (r44_c1) -> (44, 1) (user, movie)
     user_movie_indices = df.Id.apply(lambda x: x.split('_'))
-    parsed_df['User'] =  [int(i[0][1:]) for i in items_users_indices]
-    parsed_df['Movie'] = [int(i[1][1:]) for i in items_users_indices]
+    parsed_df['User'] =  [int(i[0][1:]) for i in user_movie_indices]
+    parsed_df['Movie'] = [int(i[1][1:]) for i in user_movie_indices]
     parsed_df['Rating'] = df['Prediction']
     return parsed_df
 
@@ -36,7 +36,7 @@ def split_dataset(df, p_test=0.2, min_num_ratings = 0):
     print("Train: {}, Test: {}".format(test.shape, train.shape))
     
     # Test that the sum of nb rows of splitted dataframes = nb rows of original
-    if (train_tr.shape[0] + test_tr.shape[0] == df.shape[0]):
+    if (train.shape[0] + test.shape[0] == df.shape[0]):
         return train.reset_index(drop=True), test.reset_index(drop=True)
     else:
         raise Exception("[Error] Train: {} + Test {} != Original: {} !!".format(train_tr.shape[0], test_tr.shape[0], df.shape[0]))
