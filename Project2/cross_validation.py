@@ -25,7 +25,7 @@ train_data = Interactions(user_ids=user_tr, item_ids=movie_tr, ratings=rating_tr
 test_data = Interactions(user_ids=user_tr, item_ids=movie_te)
 
 loss = ['regression', 'logistic', 'poisson']
-n_iter = np.linspace(20, 100, 9)
+n_iter = [20, 30, 40, 50, 70, 100, 200]
 batch_size = [256, 512, 1024, 2048, 4096]
 l2 = np.logspace(-15, -1, 100)
 learning_rate = np.logspace(-15, -3, 100)
