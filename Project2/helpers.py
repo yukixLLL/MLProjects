@@ -19,6 +19,10 @@ class Timer:
             print("Time taken: {}".format(time_taken))
         self.t = 0
         return time_taken
+    
+    def now(self):
+        time_taken = datetime.timedelta(seconds=time.time() - self.t).__str__()
+        return time_taken
 
 def load_dataset(path):
     """Load dataset as a (User, Movie, Rating) pandas dataframe"""
