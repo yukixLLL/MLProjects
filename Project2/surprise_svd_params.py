@@ -28,6 +28,7 @@ def surprise_svd_best_params(train_path="datas/train.csv", test_path="datas/test
     data = Dataset.load_from_file(train_path, reader)
     
     #svd parameters
+    n_factors = [50, 100, 200]
     n_epochss = np.linspace(200, 40, 9, dtype=np.int32)
     reg_alls = np.logspace(-2, -5, 4)
     lr_bus = np.logspace(-10, -2, 9)
@@ -45,10 +46,13 @@ def surprise_svd_best_params(train_path="datas/train.csv", test_path="datas/test
                 params['lr_bu'] = lr_bu
                 for lr_qi in lr_qis:
                     params['lr_qi'] = lr_qi
-                    algo = SVD(n_epoch = n_epoch, reg_all = reg_all, lr_bu = lr_bu, lr_qi = lr_qi)
-                    rmse = surprise_cv_algo(data, algo)
-                    print("------Time:{}, rmse: {}, n_epoch: {}, reg_all: {}, lr_bu: {}, lr_qi: {}------\n\n".format(t.now(), rmse, n_epoch, reg_all, lr_bu, lr_qi))
-                    rmses[rmse] = params
+                    for n_factor in n_factors:
+                        params['n_factor'] = n_factor
+                        
+                        algo = SVD(n_factors = n_factor, n_epochs = n_epoch, reg_all = reg_all, lr_bu = lr_bu, lr_qi = lr_qi, verbose=True)
+                        rmse = surprise_cv_algo(data, algo)
+                        print("------Time:{}, rmse: {}, n_factor:{}, n_epoch: {}, reg_all: {}, lr_bu: {}, lr_qi: {}------\n\n".format(t.now(), rmse, n_factor, n_epoch, reg_all, lr_bu, lr_qi))
+                        rmses[rmse] = params
     
     # Find the model with least RMSE
     lowest_rmse = min(rmses.keys())
