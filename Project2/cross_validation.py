@@ -25,10 +25,10 @@ train_data = Interactions(user_ids=user_tr, item_ids=movie_tr, ratings=rating_tr
 test_data = Interactions(user_ids=user_tr, item_ids=movie_te)
 
 loss = ['regression', 'logistic', 'poisson']
-n_iter = [20, 30, 40, 50, 70, 100, 200]
+n_iter = [50, 100, 200]
 batch_size = [256, 512, 1024, 2048, 4096]
-l2 = np.logspace(-15, -1, 100)
-learning_rate = np.logspace(-15, -3, 100)
+l2 = np.logspace(-10, -3, 8)
+learning_rate = np.logspace(-10, -3, 8)
 embedding_dim = [20, 50, 100, 150, 200]
 
 def best_params_spotlight(losses, n_iters, batch_sizes, l2s, learning_rates, embedding_dims, train_data, t = Timer()):
@@ -67,7 +67,7 @@ def best_params_spotlight(losses, n_iters, batch_sizes, l2s, learning_rates, emb
                             print("-----------Time: {}, Loss: {}, n_iter: {}, l2: {}, batch_size: {}, learning_rate: {}, embedding_dim: {}, rmse: {}-------------\n\n".format(t.stop(), loss, n_iter, l2, batch_size, learning_rate, embedding_dim, rmse))
                             # restart timer
                             t.start()
-    return rmses
+#     return rmses
 
 timer = Timer()
 timer.start()
