@@ -48,11 +48,11 @@ def best_params_spotlight(losses, n_iters, batch_sizes, l2s, learning_rates, emb
                         for embedding_dim in embedding_dims:
                             params['embedding_dim'] = embedding_dim
                             model = ExplicitFactorizationModel(loss='regression',
-                               embedding_dim=128,  # latent dimensionality
-                               n_iter=1,  # number of epochs of training
-                               batch_size=1024,  # minibatch size
-                               l2=1e-9,  # strength of L2 regularization
-                               learning_rate=1e-3,
+                               embedding_dim=embedding_dim,  # latent dimensionality
+                               n_iter=n_iter,  # number of epochs of training
+                               batch_size=batch_size,  # minibatch size
+                               l2=l2,  # strength of L2 regularization
+                               learning_rate=learning_rate,
                                use_cuda=torch.cuda.is_available())
                             
                             params['model'] = model
