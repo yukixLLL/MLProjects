@@ -1,3 +1,10 @@
+from surprise import *
+from surprise.model_selection import KFold, PredefinedKFold
+from surprise import accuracy
+from helpers import Timer
+import pandas as pd
+import numpy as np
+
 def surprise_cv_algo(data, algo, k_fold=5, verbose=True):
     # Split into folds
     kf = KFold(n_splits=k_fold)
