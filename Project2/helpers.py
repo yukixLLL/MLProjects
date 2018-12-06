@@ -1,5 +1,24 @@
 import pandas as pd
 import numpy as np
+import time
+import datetime
+
+class Timer:
+    import time
+    import datetime 
+    
+    def __init__(self):
+        self.t = 0
+        
+    def start(self):
+        self.t = time.time()
+        
+    def stop(self, verbose = False):
+        time_taken = datetime.timedelta(seconds=time.time() - self.t).__str__()
+        if verbose:
+            print("Time taken: {}".format(time_taken))
+        self.t = 0
+        return time_taken
 
 def load_dataset(path):
     """Load dataset as a (User, Movie, Rating) pandas dataframe"""
@@ -52,3 +71,10 @@ def compute_rmse(pred, truth):
     rmse = np.sqrt(mse)
 
     return rmse
+
+def create_csv_submission(predictions):
+    """Create submission file """
+    print("Creating submission file...")
+    predictions['Id'] = predictions.apply(lambda x: 'r{}_c{}'.format(x.User, x.Movie))
+    predictions['Prediction'] = predictions.Rating
+    return predictions[['Id', 'Prediction']]
