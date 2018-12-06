@@ -38,7 +38,7 @@ def surprise_svd_best_params(train_path="datas/train.csv", test_path="datas/test
     t.start()
     
     for n_epoch in n_epochss:
-        params['n_epoch'] = k
+        params['n_epoch'] = n_epoch
         for reg_all in reg_alls:
             params['reg_all'] = reg_all
             for lr_bu in lr_bus:
