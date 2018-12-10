@@ -41,7 +41,7 @@ def surprise_knn_best_params(train_path="datas/train.csv", test_path="datas/test
             params['name'] = name
             for user_based in user_baseds:
                 params['user_based'] = user_based
-                algo = KNNBaseline(k=k, sim_options={'name': name, 'user_based': user_based})
+                algo = KNNBaseline(k=k, sim_options={'name': name, 'user_based': user_based}, verbose=True)
                 rmse = surprise_cv_algo(data, algo)
                 print("------Time:{}, rmse: {}, k: {}, name: {}, user_based: {}------\n\n".format(t.now(), rmse, k, name, user_based))
                 rmses[rmse] = params
