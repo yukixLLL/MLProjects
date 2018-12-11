@@ -76,6 +76,16 @@ def compute_rmse(pred, truth):
 
     return rmse
 
+def toPyFMData(df):
+    """Transform pandas dataframe into the dataformat PyFM needs"""
+    data = []
+    users = set(df.User.unique())
+    movies = set(df.Movie.unique())
+    ratings = df.Rating.astype(float).tolist()
+    for row in df.iterrows():
+        data.append({"user_id": str(row[1].User), "movie_id": str(row[1].Movie)})
+    return (data, np.array(ratings), users, movies)
+
 def create_csv_submission(predictions):
     """Create submission file """
     print("Creating submission file...")
