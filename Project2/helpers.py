@@ -89,6 +89,6 @@ def toPyFMData(df):
 def create_csv_submission(predictions):
     """Create submission file """
     print("Creating submission file...")
-    predictions['Id'] = predictions.apply(lambda x: 'r{}_c{}'.format(x.User, x.Movie))
+    predictions['Id'] = predictions.apply(lambda x: 'r{}_c{}'.format(x.User, x.Movie), axis=1)
     predictions['Prediction'] = predictions.Rating
     return predictions[['Id', 'Prediction']]
