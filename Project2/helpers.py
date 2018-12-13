@@ -46,7 +46,7 @@ def split_dataset(df, p_test=0.2, min_num_ratings = 0):
     valid_ratings = df[df.User.isin(valid_users) & df.Movie.isin(valid_movies)].reset_index(drop=True)
 
     # Split data
-    size = df.shape[0]
+    size = valid_ratings.shape[0]
     indexes = list(range(size))
     np.random.shuffle(indexes)
     
@@ -59,7 +59,7 @@ def split_dataset(df, p_test=0.2, min_num_ratings = 0):
     print("Train: {}, Test: {}".format(test.shape, train.shape))
     
     # Test that the sum of nb rows of splitted dataframes = nb rows of original
-    if (train.shape[0] + test.shape[0] == df.shape[0]):
+    if (train.shape[0] + test.shape[0] == valid_ratings.shape[0]):
         return train.reset_index(drop=True), test.reset_index(drop=True)
     else:
         raise Exception("[Error] Train: {} + Test {} != Original: {} !!".format(train_tr.shape[0], test_tr.shape[0], df.shape[0]))
