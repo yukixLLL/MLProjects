@@ -22,7 +22,7 @@ def pyFM_cv_algo(algo, k_fold=5, verbose=True):
         X_test = v.transform(test_data)
     
         algo.fit(X_train,y_train)
-        preds = fm.predict(X_test)
+        preds = algo.predict(X_test)
         for i in range(len(preds)):
             if preds[i] > 5:
                 preds[i] = 5
@@ -31,7 +31,7 @@ def pyFM_cv_algo(algo, k_fold=5, verbose=True):
         predictions = testset.copy()
         predictions['Rating'] = preds
 
-        rmse_ += compute_rmse(predictions, test)
+        rmse_ += compute_rmse(predictions, testset)
         
     rmse_mean = rmse_/k_fold
     return rmse_mean
