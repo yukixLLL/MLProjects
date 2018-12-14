@@ -69,7 +69,7 @@ def compute_rmse(pred, truth):
     truth_sorted = truth.sort_values(['User', 'Movie']).reset_index(drop=True)
     pred_sorted = pred.sort_values(['User', 'Movie']).reset_index(drop=True)
 
-    truth_sorted['square_error'] = np.square(truth_sorted['Rating'] - prediction_sorted['Rating'])
+    truth_sorted['square_error'] = np.square(truth_sorted['Rating'] - pred_sorted['Rating'])
 
     mse = truth_sorted['square_error'].mean()
     rmse = np.sqrt(mse)
