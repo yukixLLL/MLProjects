@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from helpers import compute_rmse
+from baseline_helpers import *
 
 def baseline_global_mean(train, test, training=False):
     mean = train.Rating.mean()
@@ -90,7 +91,7 @@ def baseline_movie_median(train, test, training=False):
 
 def movie_mean_user_standardize(train, test, training=False):
     stand_train = user_standardize(train)
-    stand_pred_test, rmse = baseline_movie_mean(stand_train, test)
+    stand_pred_test = baseline_movie_mean(stand_train, test)
 
     #recover from the standardized predicted test rating
     pred_test = user_standardize_recover(train, stand_pred_test)
@@ -107,7 +108,7 @@ def movie_median_user_standardize(train, test, training=False):
     stand_train = user_standardize(train)
 
     #predict the standardized test rating
-    stand_pred_test, rmse = baseline_movie_median(stand_train, test)
+    stand_pred_test = baseline_movie_median(stand_train, test)
 
     #recover from the standardized predicted test rating
     pred_test = user_standardize_recover(train, stand_pred_test)
@@ -126,7 +127,7 @@ def movie_mean_user_habit_standardize(train, test, training=False):
     stand_train = user_habit_standardize(train)
 
     #predict the standardized test rating
-    stand_pred_test, rmse = baseline_movie_mean(stand_train, test)
+    stand_pred_test = baseline_movie_mean(stand_train, test)
 
     #recover from the standardized predicted test rating
     pred_test = user_habit_standardize_recover(train, stand_pred_test)
@@ -144,7 +145,7 @@ def movie_median_user_habit_standardize(train, test, training=False):
     stand_train = user_habit_standardize(train)
 
     #predict the standardized test rating
-    stand_pred_test, rmse = baseline_movie_median(stand_train, test)
+    stand_pred_test = baseline_movie_median(stand_train, test)
 
     #recover from the standardized predicted test rating
     pred_test = user_habit_standardize_recover(train, stand_pred_test)

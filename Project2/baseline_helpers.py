@@ -32,3 +32,6 @@ def user_habit_standardize_recover(df, stand_pred_test):
     pred_test = stand_pred_test.copy()
     pred_test['Rating'] = stand_pred_test.apply(lambda x: x['Rating'] + habit[x['User']], axis=1)
     return pred_test
+
+def baseline_algo(train, test, model, training=False):
+    return model(train, test, training=training)
