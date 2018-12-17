@@ -21,7 +21,7 @@ def baseline_global_median(train, test, training=False):
         rmse = compute_rmse(pred_test, test)
         print("baseline_global_median: {}".format(rmse))
           
-    return pred_test, rmse
+    return pred_test
 
 def baseline_user_mean(train, test, training=False):
     mean_per_user = train.groupby('User').mean().Rating
