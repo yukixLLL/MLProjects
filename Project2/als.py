@@ -80,8 +80,6 @@ def get_number_per(ratings):
     # do statistics.
     num_items_per_user = np.array((ratings != 0).sum(axis=0)).flatten()
     num_users_per_item = np.array((ratings != 0).sum(axis=1).T).flatten()
-    sorted_num_movies_per_user = np.sort(num_items_per_user)[::-1]
-    sorted_num_users_per_movie = np.sort(num_users_per_item)[::-1]
     return num_items_per_user, num_users_per_item
 
 def split_data(ratings, num_users_per_movie, num_movies_per_user,
