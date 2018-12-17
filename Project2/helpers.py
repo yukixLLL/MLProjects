@@ -24,7 +24,7 @@ class Timer:
         time_taken = datetime.timedelta(seconds=time.time() - self.t).__str__()
         return time_taken
 
-def load_dataset(path):
+def load_dataset(path, min_num_ratings = 10):
     """Load dataset as a (User, Movie, Rating) pandas dataframe"""
     df = pd.read_csv(path)
     parsed_df = pd.DataFrame()
@@ -33,9 +33,19 @@ def load_dataset(path):
     parsed_df['User'] =  [int(i[0][1:]) for i in user_movie_indices]
     parsed_df['Movie'] = [int(i[1][1:]) for i in user_movie_indices]
     parsed_df['Rating'] = df['Prediction']
-    return parsed_df
+    
+    # select user and item based on the condition.
+    user_counts = parsed_df.User.value_counts()
+    valid_users = user_counts[user_counts > min_num_ratings].index.values
+    movie_counts = parsed_df.Movie.value_counts()
+    valid_movies = movie_counts[movie_counts > min_num_ratings].index.values
 
-def split_dataset(df, p_test=0.2, min_num_ratings = 0, verbose=False):
+    valid_ratings = parsed_df[(parsed_df.User.isin(valid_users)) & (parsed_df.Movie.isin(valid_movies))].reset_index(drop=True)
+    print("[load_dataset] Valid: {}".format(valid_ratings.shape))
+    
+    return valid_ratings
+
+def split_dataset(df, p_test=0.2, min_num_ratings = 10, verbose=False):
     """ split dataframe into train and test set """
     # select user and item based on the condition.
     user_counts = df.User.value_counts()
@@ -43,7 +53,8 @@ def split_dataset(df, p_test=0.2, min_num_ratings = 0, verbose=False):
     movie_counts = df.Movie.value_counts()
     valid_movies = movie_counts[movie_counts > min_num_ratings].index.values
 
-    valid_ratings = df[df.User.isin(valid_users) & df.Movie.isin(valid_movies)].reset_index(drop=True)
+    valid_ratings = df[(df.User.isin(valid_users)) & (df.Movie.isin(valid_movies))].reset_index(drop=True)
+    print("[split_dataset] Valid: {}".format(valid_ratings.shape))
 
     # Split data
     size = valid_ratings.shape[0]
