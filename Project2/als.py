@@ -1,3 +1,89 @@
+import numpy as np
+import scipy
+import scipy.io
+import scipy.sparse as sp
+from itertools import groupby
+import pandas as pd
+# import warnings
+# warnings.simplefilter("ignore")
+import os
+from helpers import *
+
+def read_txt(path):
+    """read text file from path."""
+    with open(path, "r") as f:
+        return f.read().splitlines()
+
+
+def load_data(path_dataset):
+    """Load data in text format, one rating per line, as in the kaggle competition."""
+    data = read_txt(path_dataset)[1:]
+    return preprocess_data(data)
+
+
+def preprocess_data(data):
+    """preprocessing the text data, conversion to numerical array format."""
+    def deal_line(line):
+        pos, rating = line.split(',')
+        row, col = pos.split("_")
+        row = row.replace("r", "")
+        col = col.replace("c", "")
+        return int(row), int(col), float(rating)
+
+    def statistics(data):
+        row = set([line[0] for line in data])
+        col = set([line[1] for line in data])
+        return min(row), max(row), min(col), max(col)
+
+    # parse each line
+    data = [deal_line(line) for line in data]
+
+    # do statistics on the dataset.
+    min_row, max_row, min_col, max_col = statistics(data)
+    print("number of items: {}, number of users: {}".format(max_row, max_col))
+
+    # build rating matrix.
+    ratings = sp.lil_matrix((max_row, max_col))
+    for row, col, rating in data:
+        ratings[row - 1, col - 1] = rating
+    return ratings
+
+
+def group_by(data, index):
+    """group list of list by a specific index."""
+    sorted_data = sorted(data, key=lambda x: x[index])
+    groupby_data = groupby(sorted_data, lambda x: x[index])
+    return groupby_data
+
+
+def build_index_groups(train):
+    """build groups for nnz rows and cols."""
+    # row : items; cols: users
+    nz_row, nz_col = train.nonzero()
+    nz_train = list(zip(nz_row, nz_col))
+
+    grouped_nz_train_byrow = group_by(nz_train, index=0) # group by items 
+#     for g, value in grouped_nz_train_byrow:
+#         print("{}, {}".format(g, list(value))) #value for g=0: (0, 1) (0, 2) (0, 3) index of all the users that rated the item 0
+    nz_row_colindices = [(g, np.array([v[1] for v in value])) # indices of all the users that rated item g
+                         for g, value in grouped_nz_train_byrow]
+    
+#     print(nz_row_colindices)
+
+    grouped_nz_train_bycol = group_by(nz_train, index=1) # group by users
+    nz_col_rowindices = [(g, np.array([v[0] for v in value])) # indices of all the movies rated by user g
+                         for g, value in grouped_nz_train_bycol]
+    return nz_train, nz_row_colindices, nz_col_rowindices
+
+def get_number_per(ratings):
+    """plot the statistics result on raw rating data."""
+    # do statistics.
+    num_items_per_user = np.array((ratings != 0).sum(axis=0)).flatten()
+    num_users_per_item = np.array((ratings != 0).sum(axis=1).T).flatten()
+    sorted_num_movies_per_user = np.sort(num_items_per_user)[::-1]
+    sorted_num_users_per_movie = np.sort(num_users_per_item)[::-1]
+    return num_items_per_user, num_users_per_item
+
 def split_data(ratings, num_users_per_movie, num_movies_per_user,
                min_num_ratings, p_test=0.1):
     """split the ratings to training data and test data.
@@ -44,7 +130,7 @@ def split_data(ratings, num_users_per_movie, num_movies_per_user,
     print("Total number of nonzero elements in test data:{v}".format(v=test.nnz))
     return valid_ratings, train, test
 
-    def init_MF(train, num_features,weight=1.0):
+def init_MF(train, num_features,weight=1.0):
     """init the parameter for matrix factorization."""
     
     num_user,num_movie = train.shape
@@ -57,7 +143,7 @@ def split_data(ratings, num_users_per_movie, num_movies_per_user,
     
     return movie_features, user_features
 
-    def compute_error(data, movie_features, user_features, nz):
+def compute_error(data, movie_features, user_features, nz):
     """compute the loss (MSE) of the prediction of nonzero elements."""
     # calculate rmse (we only consider nonzero entries.)
     mse = 0
@@ -69,7 +155,7 @@ def split_data(ratings, num_users_per_movie, num_movies_per_user,
     rmse = np.sqrt(1.0*mse/len(nz))
     return rmse
 
-    def update_movie_feature(
+def update_movie_feature(
         train, user_features, lambda_movie,
         nnz_users_per_movie, nz_movie_userindices):
     """update movie feature matrix."""
@@ -109,7 +195,7 @@ def update_user_feature(
         updated_user_features[:,user] = np.copy(W_star.T)
     return updated_user_features
 
-    def ALS(train, test,num_features,lambda_movie,lambda_user,max_weight=1.0,iterations=50):
+def ALS(train, test,num_features,lambda_movie,lambda_user,max_weight=1.0,iterations=50):
     """Alternating Least Squares (ALS) algorithm."""
     # define parameters
     stop_criterion = 1e-5
@@ -158,7 +244,7 @@ def update_user_feature(
     
     return user_features,movie_features,test_rmse
 
-    def cv_ALS_random_search(train,test,seed=988):
+def cv_ALS_random_search(train,test,seed=988):
 #     # set seed
 #     np.random.seed(seed)
     movies_range = np.linspace(0.01,1,num=100)
@@ -216,7 +302,7 @@ def update_user_feature(
     np.save("best_param_random_search.npy", best_param)
     return best_num_feature,best_weight,best_lambda_movie,bset_lambda_user
 
-    def split_for_cv(train,p_test=0.2,k_fold=5):
+def split_for_cv(train,p_test=0.2,k_fold=5):
     # init
     num_rows, num_cols = train.shape
     nz_users, nz_movies = train.nonzero()
@@ -243,7 +329,7 @@ def update_user_feature(
         
     return train_tr_list, test_tr_list
 
-    def predict_ALS(num_features=None,lambda_movie=None,lambda_user=None,weight=None,load_File=None):
+def predict_ALS(num_features=None,lambda_movie=None,lambda_user=None,weight=None,load_File=None):
     seed = 988
     train_dataset = "./data/data_train.csv"
     ratings = load_data(train_dataset)
