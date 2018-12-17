@@ -1,0 +1,97 @@
+RMSE: 1.0688
+RMSE: 1.0662
+RMSE: 1.0696
+RMSE: 1.0686
+RMSE: 1.0689
+------Time:0:33:30.229967, rmse: 1.0684423866741923, n_factor:50, n_epoch: 200, reg_all: 0.01, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.1120
+RMSE: 1.1137
+RMSE: 1.1112
+RMSE: 1.1075
+RMSE: 1.1070
+------Time:1:05:57.614145, rmse: 1.1102892706435732, n_factor:50, n_epoch: 200, reg_all: 0.001, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.1172
+RMSE: 1.1164
+RMSE: 1.1176
+RMSE: 1.1182
+RMSE: 1.1165
+------Time:1:40:10.498871, rmse: 1.1171813076582864, n_factor:50, n_epoch: 200, reg_all: 0.0001, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.1186
+RMSE: 1.1171
+RMSE: 1.1179
+RMSE: 1.1177
+RMSE: 1.1174
+------Time:2:11:18.933913, rmse: 1.1177431240021318, n_factor:50, n_epoch: 200, reg_all: 1e-05, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.1109
+RMSE: 1.1108
+RMSE: 1.1114
+RMSE: 1.1130
+RMSE: 1.1067
+------Time:3:25:53.833358, rmse: 1.1105451725155788, n_factor:50, n_epoch: 500, reg_all: 0.01, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.1909
+RMSE: 1.1884
+RMSE: 1.1940
+RMSE: 1.1901
+RMSE: 1.1921
+------Time:5:38:29.124262, rmse: 1.1910819025164066, n_factor:50, n_epoch: 500, reg_all: 0.001, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.2064
+RMSE: 1.2037
+RMSE: 1.2043
+RMSE: 1.2039
+RMSE: 1.2056
+------Time:6:55:35.905743, rmse: 1.2047569379278407, n_factor:50, n_epoch: 500, reg_all: 0.0001, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.2065
+RMSE: 1.2073
+RMSE: 1.2066
+RMSE: 1.2058
+RMSE: 1.2093
+------Time:8:15:26.534938, rmse: 1.2070951952274196, n_factor:50, n_epoch: 500, reg_all: 1e-05, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.1344
+RMSE: 1.1349
+RMSE: 1.1327
+RMSE: 1.1321
+RMSE: 1.1314
+------Time:18:46:45.195504, rmse: 1.133109449927518, n_factor:50, n_epoch: 800, reg_all: 0.01, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.2327
+RMSE: 1.2316
+RMSE: 1.2261
+RMSE: 1.2281
+RMSE: 1.2314
+------Time:20:56:56.119110, rmse: 1.2299719368291018, n_factor:50, n_epoch: 800, reg_all: 0.001, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.2480
+RMSE: 1.2539
+RMSE: 1.2482
+RMSE: 1.2457
+RMSE: 1.2469
+------Time:23:51:42.646699, rmse: 1.2485217296954907, n_factor:50, n_epoch: 800, reg_all: 0.0001, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+RMSE: 1.2479
+RMSE: 1.2521
+RMSE: 1.2471
+RMSE: 1.2514
+RMSE: 1.2490
+------Time:1 day, 1:51:13.650676, rmse: 1.24950756604303, n_factor:50, n_epoch: 800, reg_all: 1e-05, lr_bu: 1e-09, lr_qi: 1e-05------
+
+
+Best svd rmse: 1.0684423866741923, n_epoch: 800, reg_all: 1e-05, lr_bu: 1e-09, lr_qi: 1e-05
