@@ -4,6 +4,7 @@ from helpers import *
 from pyfm import pylibfm
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.model_selection import KFold
+from sklearn.metrics import mean_squared_error
 
 def pyFM_cv_algo(algo, k_fold=5, verbose=True):
     
@@ -23,23 +24,20 @@ def pyFM_cv_algo(algo, k_fold=5, verbose=True):
     
         algo.fit(X_train,y_train)
         preds = algo.predict(X_test)
-        for i in range(len(preds)):
-            if preds[i] > 5:
-                preds[i] = 5
-            elif preds[i] < 1:
-                preds[i] = 1
-        predictions = testset.copy()
-        predictions['Rating'] = preds
 
-        rmse_ += compute_rmse(predictions, testset)
+        mse = mean_squared_error(y_test,preds)
+        rmse = np.sqrt(mse)
+        print("FM RMSE: {}".format(rmse))
+
+        rmse_ += rmse
         
     rmse_mean = rmse_/k_fold
     return rmse_mean
         
 def pyFM_cv(verbose=True, t = Timer()): 
     #pyFM parameters
-    factors = np.linspace(20, 200, 9, dtype=np.int64)
-    learning_rates = np.logspace(-2, -5, 4)
+    factors = np.linspace(20, 200, 10, dtype=np.int64)
+    learning_rates = np.logspace(-3, -3, 1)
     params = dict()
     rmses = dict()
     
