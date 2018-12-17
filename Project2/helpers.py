@@ -35,7 +35,7 @@ def load_dataset(path):
     parsed_df['Rating'] = df['Prediction']
     return parsed_df
 
-def split_dataset(df, p_test=0.2, min_num_ratings = 0):
+def split_dataset(df, p_test=0.2, min_num_ratings = 0, verbose=False):
     """ split dataframe into train and test set """
     # select user and item based on the condition.
     user_counts = df.User.value_counts()
@@ -55,8 +55,9 @@ def split_dataset(df, p_test=0.2, min_num_ratings = 0):
     
     test = valid_ratings.loc[test_ind]
     train = valid_ratings.loc[train_ind]
-
-    print("Train: {}, Test: {}".format(test.shape, train.shape))
+    
+    if verbose:
+        print("Train: {}, Test: {}".format(train.shape, test.shape))
     
     # Test that the sum of nb rows of splitted dataframes = nb rows of original
     if (train.shape[0] + test.shape[0] == valid_ratings.shape[0]):
