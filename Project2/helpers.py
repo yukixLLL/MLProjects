@@ -64,14 +64,11 @@ def split_dataset(df, p_test=0.2, min_num_ratings = 0):
     else:
         raise Exception("[Error] Train: {} + Test {} != Original: {} !!".format(train_tr.shape[0], test_tr.shape[0], df.shape[0]))
 
-def compute_rmse(pred, truth):
-    """ compute RMSE for pandas dataframes """
-    truth_sorted = truth.sort_values(['User', 'Movie']).reset_index(drop=True)
-    pred_sorted = pred.sort_values(['User', 'Movie']).reset_index(drop=True)
+def compute_rmse(pred, real):
+    pred_sorted = pred.sort_values(['Movie', 'User']).reset_index(drop=True)
+    real_sorted = real.sort_values(['Movie', 'User']).reset_index(drop=True)
 
-    truth_sorted['square_error'] = np.square(truth_sorted['Rating'] - pred_sorted['Rating'])
-
-    mse = truth_sorted['square_error'].mean()
+    mse = np.square(pred_sorted.Rating - real_sorted.Rating).mean()
     rmse = np.sqrt(mse)
 
     return rmse
