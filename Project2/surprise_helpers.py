@@ -7,33 +7,12 @@ import numpy as np
 import os 
 from constants import *
 
-def prepare_surprise_data(path, name):
+def prepare_surprise_data(train, test, folder="./datas/tmp/"):
     """Save as a (User, Movie, Rating) pandas dataframe without column names"""
-    df = pd.read_csv(path)
-    parsed_df = pd.DataFrame()
-    # Get all pairs of (r44_c1) -> (44, 1) (user, movie)
-    user_movie_indices = df.Id.apply(lambda x: x.split('_'))
-    parsed_df['User'] =  [int(i[0][1:]) for i in user_movie_indices]
-    parsed_df['Movie'] = [int(i[1][1:]) for i in user_movie_indices]
-    parsed_df['Rating'] = df['Prediction']
-    num_items = parsed_df.Movie.nunique()
-    num_users = parsed_df.User.nunique()
-    
     # save to csv for later use
-    parsed_df.to_csv(name, index=False, header=False)
-    
-    print("Saved {}; USERS: {} ITEMS: {}".format(name, num_users, num_items))
-
-def surprise_algo(train, test, algo, verbose=True, training=False):
-    """"Note: Train and test are not used"""
-    # Check if file exists
-    train_exists = os.path.isfile(surprise_train_path)
-    if not train_exists:
-        prepare_surprise_data(train_dataset, surprise_train_path)
-    
-    test_exists = os.path.isfile(surprise_test_path)
-    if not test_exists:
-        prepare_surprise_data(test_dataset, surprise_test_path)
+    print("[prepare_surprise_data] Saving to {}, {}...".format(surprise_train_path, surprise_test_path))
+    train.to_csv(surprise_train_path, index=False, header=False)
+    test.to_csv(surprise_test_path, index=False, header=False)
     
     # reader with rating scale
     reader = Reader(line_format='user item rating', sep=',', rating_scale=(1, 5))
@@ -42,6 +21,13 @@ def surprise_algo(train, test, algo, verbose=True, training=False):
     folds_files = [(surprise_train_path, surprise_test_path)]
 
     data = Dataset.load_from_folds(folds_files, reader=reader)
+    return data
+    
+
+def surprise_algo(train, test, algo, verbose=True, training=False):
+    # prepare data
+    data = prepare_surprise_data(train, test)
+    
     pkf = PredefinedKFold()
     
     if verbose:
@@ -51,7 +37,7 @@ def surprise_algo(train, test, algo, verbose=True, training=False):
         model = algo.fit(trainset)
         predictions = algo.test(testset)
     
-    pred = pd.read_csv(test_path, names = ["User", "Movie", "Rating"])
+    pred = pd.read_csv(surprise_test_path, names = ["User", "Movie", "Rating"])
     
     if verbose:
         print("Postprocessing predictions...")
