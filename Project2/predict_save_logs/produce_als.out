@@ -1,0 +1,34 @@
+Loading baseline models...
+1 model families loaded:
+ als: als, ; 
+
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Splitting data for training...
+[split_dataset] Valid: (1176952, 3)
+Results of split:    User  Movie  Rating
+0  4292    161       3
+1  7913    757       4
+2  7963    418       2
+3  8809    168       2
+4  4814    416       4; 
+    User  Movie  Rating
+0  1207    877       3
+1  2337    179       3
+2  4221    971       4
+3  2306    148       5
+4  3092    188       4
+Predicting using algo: <function als_algo at 0x7f2fded758c8>, model: als...
+Time: 0:00:00.000019, predicting with model: als
+ALS Final training RMSE : 0.8370199606250176
+Time: 1:04:27.859771, Saving results of als...
+
+Saving ground_truth to ./predict_save/ground_truth(1:04:30.211814).csv
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Predicting using algo: <function als_algo at 0x7f2fded758c8>, model: als...
+Time: 0:00:00.000036, predicting with model: als
+ALS Final training RMSE : 0.926716574946068
+Time: 2:19:23.842784, Saving results of als...
+
+Saving ground_truth to ./predict_save/ground_truth(2:19:28.512734).csv
