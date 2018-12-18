@@ -8,6 +8,7 @@ import scipy.optimize as sco
 
 from os import listdir
 from os.path import isfile, join
+import shutil
 
 folder = "./train/"
 folder_predict = "./train_predictions/"
@@ -23,38 +24,38 @@ def load_models():
             user_median = baseline_user_median,
             movie_mean = baseline_movie_mean,
             movie_median = baseline_movie_median,
-#             movie_mean_user_std = movie_mean_user_standardize,
-#             movie_median_user_std = movie_median_user_standardize,
-#             movie_mean_user_habit_std = movie_mean_user_habit_standardize,
-#             movie_median_user_habit_std = movie_median_user_habit_standardize,
-#             movie_mean_user_habit = movie_mean_user_habit,
-#             movie_median_user_habit = movie_median_user_habit,
+            movie_mean_user_std = movie_mean_user_standardize,
+            movie_median_user_std = movie_median_user_standardize,
+            movie_mean_user_habit_std = movie_mean_user_habit_standardize,
+            movie_median_user_habit_std = movie_median_user_habit_standardize,
+            movie_mean_user_habit = movie_mean_user_habit,
+            movie_median_user_habit = movie_median_user_habit,
         ),
         
 #         surprise
-#         surprise = dict(
-#             surprise_svd = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
-#             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
-#             surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
-#         ),
+        surprise = dict(
+            surprise_svd = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
+            surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
+            surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
+        ),
 #         spotlight
-#         spotlight = dict(
-#             spotlight=ExplicitFactorizationModel(loss='regression',
-#                                    embedding_dim=150,  # latent dimensionality
-#                                    n_iter=50,  # number of epochs of training
-#                                    batch_size=256,  # minibatch size
-#                                    l2=1e-5,  # strength of L2 regularization
-#                                    learning_rate=0.0001,
-#                                    use_cuda=torch.cuda.is_available()),
-#         ),
-#         # als
+        spotlight = dict(
+            spotlight=ExplicitFactorizationModel(loss='regression',
+                                   embedding_dim=150,  # latent dimensionality
+                                   n_iter=50,  # number of epochs of training
+                                   batch_size=256,  # minibatch size
+                                   l2=1e-5,  # strength of L2 regularization
+                                   learning_rate=0.0001,
+                                   use_cuda=torch.cuda.is_available()),
+        ),
+        # als
         
-#         # pyfm
-#         pyfm = dict(
-#             pyfm=pylibfm.FM(num_factors=20, num_iter=200, verbose=True, 
-#                           task="regression", initial_learning_rate=0.001, 
-#                           learning_rate_schedule="optimal")
-#         ),
+        # pyfm
+        pyfm = dict(
+            pyfm=pylibfm.FM(num_factors=20, num_iter=200, verbose=True, 
+                          task="regression", initial_learning_rate=0.001, 
+                          learning_rate_schedule="optimal")
+        ),
         # keras
         # MF
     )
@@ -77,10 +78,12 @@ def load_algos():
 algos = load_algos()
 
 
-def predict_and_save(folder = folder, training = True):
-    # create folder if not existent
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+def predict_and_save(saving_folder, training = True):
+    # create folder 
+    if os.path.exists(saving_folder):
+        shutil.rmtree(saving_folder)
+    
+    os.makedirs(saving_folder)
     
     # load csv
     train_df = load_dataset(train_dataset, min_num_ratings = 0)
@@ -116,26 +119,26 @@ def predict_and_save(folder = folder, training = True):
             else:
                 prediction = algo(train_df, test_df, model)
             print("Time: {}, Saving results of {}...\n".format(t.now(), model_name))
-            prediction.to_csv("{}{}_predictions({}).csv".format(folder, model_name, t.now()))
+            prediction.to_csv("{}{}_predictions({}).csv".format(saving_folder, model_name, t.now()))
             predictions[model_name] = prediction
         
     return predictions, test_df
 
 
-def load_predictions(folder=folder):
+def load_predictions(reading_folder):
     def get_model_name(file_name):
         results = file_name.split('_predictions')
         return results[0]
         
-    pred_array = [f for f in listdir(folder) if isfile(join(folder, f))]
+    pred_array = [f for f in listdir(reading_folder) if isfile(join(reading_folder, f))]
     # Set user, col indices
-    predictions = pd.read_csv(join(folder, pred_array[0]), index_col=0).copy().reset_index(drop=True)
+    predictions = pd.read_csv(join(reading_folder, pred_array[0]), index_col=0).copy().reset_index(drop=True)
     predictions = predictions.drop(['Rating'], axis=1)
     predictions = predictions.sort_values(by=['User', 'Movie'])
 
     for i, pred in enumerate(pred_array):
         print("Reading {}/{} : {}...".format(i + 1, len(pred_array), pred))
-        p = pd.read_csv(join(folder, pred), index_col=0).sort_values(by=['User', 'Movie']).reset_index(drop=True)
+        p = pd.read_csv(join(reading_folder, pred), index_col=0).sort_values(by=['User', 'Movie']).reset_index(drop=True)
         p = p.rename(index=str, columns={'Rating': get_model_name(pred)})
         predictions = pd.merge(predictions, p, how='outer', on=['User', 'Movie']).reset_index(drop=True)
     
@@ -145,7 +148,7 @@ def optimize(models, ground_truth, folder=folder):
     t = Timer()
     t.start()
     print("Loading predictions....")
-    predictions = load_predictions(folder=folder)
+    predictions = load_predictions(folder)
     print("Time: {}, Finished loading.".format(t.now()))
     t.stop(verbose= False)
     
@@ -199,8 +202,8 @@ def get_best_weights(res, models, predictions, ground_truth):
 
 def predict(weight_dict):
     print("Predicting....")
-    predictions, _ = predict_and_save(folder=folder_predict, training=False)
-    predictions = load_predictions(folder=folder_predict)
+    predictions, _ = predict_and_save(folder_predict, training=False)
+    predictions = load_predictions(folder_predict)
     print("Finished loading.")
     
     stacked = np.zeros(predictions.shape[0])
@@ -218,7 +221,7 @@ def predict(weight_dict):
 
 if __name__ == '__main__':
     models = load_models()
-    predictions, ground_truth = predict_and_save()
+    predictions, ground_truth = predict_and_save(folder)
     res, predictions_tr = optimize(models, ground_truth)
     models = load_models()
     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
