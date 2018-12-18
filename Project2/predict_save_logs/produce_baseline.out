@@ -1,0 +1,58 @@
+Loading baseline models...
+1 model families loaded:
+ baseline: global_mean, global_median, user_mean, user_median, movie_mean, movie_median, movie_mean_user_std, movie_median_user_std, movie_mean_user_habit_std, movie_median_user_habit_std, movie_mean_user_habit, movie_median_user_habit, ; 
+
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Splitting data for training...
+[split_dataset] Valid: (1176952, 3)
+Results of split:    User  Movie  Rating
+0  4292    161       3
+1  7913    757       4
+2  7963    418       2
+3  8809    168       2
+4  4814    416       4; 
+    User  Movie  Rating
+0  1207    877       3
+1  2337    179       3
+2  4221    971       4
+3  2306    148       5
+4  3092    188       4
+Predicting using algo: <function baseline_algo at 0x7f5e440ac400>, model: baseline...
+Time: 0:00:00.000016, predicting with model: global_mean
+Time: 0:00:00.016016, Saving results of global_mean...
+
+Time: 0:00:02.497848, predicting with model: global_median
+Time: 0:00:02.526896, Saving results of global_median...
+
+Time: 0:00:04.594178, predicting with model: user_mean
+Time: 0:00:10.599151, Saving results of user_mean...
+
+Time: 0:00:13.168442, predicting with model: user_median
+Time: 0:00:19.020245, Saving results of user_median...
+
+Time: 0:00:21.078306, predicting with model: movie_mean
+Time: 0:00:21.868620, Saving results of movie_mean...
+
+Time: 0:00:24.379167, predicting with model: movie_median
+Time: 0:00:25.222595, Saving results of movie_median...
+
+Time: 0:00:28.345887, predicting with model: movie_mean_user_std
+Time: 0:02:06.691087, Saving results of movie_mean_user_std...
+
+Time: 0:02:11.281480, predicting with model: movie_median_user_std
+Time: 0:03:47.496670, Saving results of movie_median_user_std...
+
+Time: 0:03:52.426608, predicting with model: movie_mean_user_habit_std
+Time: 0:04:58.038797, Saving results of movie_mean_user_habit_std...
+
+Time: 0:05:02.264050, predicting with model: movie_median_user_habit_std
+Time: 0:06:05.727327, Saving results of movie_median_user_habit_std...
+
+Time: 0:06:09.476657, predicting with model: movie_mean_user_habit
+Time: 0:07:36.478028, Saving results of movie_mean_user_habit...
+
+Time: 0:07:40.976095, predicting with model: movie_median_user_habit
+Time: 0:09:05.364691, Saving results of movie_median_user_habit...
+
+Saving ground_truth to ./predict_save/ground_truth(0:09:09.258755).csv
