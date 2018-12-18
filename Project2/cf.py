@@ -1,6 +1,6 @@
 from keras.models import Model
-from keras.callbacks import ModelCheckpoint
-from keras.layers import dot, concatenate, Embedding, Input, Flatten, Dropout, Dense, EarlyStopping
+from keras.callbacks import ModelCheckpoint, EarlyStopping
+from keras.layers import dot, concatenate, Embedding, Input, Flatten, Dropout, Dense 
 import numpy as np
 # from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
@@ -81,7 +81,7 @@ class CollaborativeFilteringV1(object):
 
         weight_file_path = CollaborativeFilteringV1.get_weight_file_path(model_dir_path)
         checkpoint = ModelCheckpoint(weight_file_path)
-        stop = EarlyStopping(monitor='val_loss', min_delta=0.001, patience=2, mode='min')
+        stop = EarlyStopping(monitor='val_loss', min_delta=0.001, patience=0, mode='min')
         history = self.model.fit([user_id_train, item_id_train], rating_train,
                                  batch_size=batch_size, epochs=epoches, validation_split=validation_split,
                                  shuffle=True, verbose=VERBOSE, callbacks=[checkpoint, stop])
@@ -181,9 +181,10 @@ class CollaborativeFilteringV2(object):
 
         weight_file_path = CollaborativeFilteringV2.get_weight_file_path(model_dir_path)
         checkpoint = ModelCheckpoint(weight_file_path)
+        stop = EarlyStopping(monitor='val_loss', min_delta=0.001, patience=0, mode='min')
         history = self.model.fit([user_id_train, item_id_train], rating_train,
                                  batch_size=batch_size, epochs=epoches, validation_split=validation_split,
-                                 shuffle=True, verbose=VERBOSE, callbacks=[checkpoint])
+                                 shuffle=True, verbose=VERBOSE, callbacks=[checkpoint, stop])
         self.model.save_weights(weight_file_path)
 
         return history
