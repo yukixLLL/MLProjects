@@ -9,6 +9,9 @@ import scipy.optimize as sco
 from os import listdir
 from os.path import isfile, join
 
+folder = "./train/"
+folder_predict = "./train_predictions/"
+
 def load_models():
     print("Loading models...")
     models_dict = dict(
@@ -20,12 +23,12 @@ def load_models():
             user_median = baseline_user_median,
             movie_mean = baseline_movie_mean,
             movie_median = baseline_movie_median,
-            movie_mean_user_std = movie_mean_user_standardize,
-            movie_median_user_std = movie_median_user_standardize,
-            movie_mean_user_habit_std = movie_mean_user_habit_standardize,
-            movie_median_user_habit_std = movie_median_user_habit_standardize,
-            movie_mean_user_habit = movie_mean_user_habit,
-            movie_median_user_habit = movie_median_user_habit,
+#             movie_mean_user_std = movie_mean_user_standardize,
+#             movie_median_user_std = movie_median_user_standardize,
+#             movie_mean_user_habit_std = movie_mean_user_habit_standardize,
+#             movie_median_user_habit_std = movie_median_user_habit_standardize,
+#             movie_mean_user_habit = movie_mean_user_habit,
+#             movie_median_user_habit = movie_median_user_habit,
         ),
         
 #         surprise
@@ -74,7 +77,7 @@ def load_algos():
 algos = load_algos()
 
 
-def predict_and_save(folder = "./predictions/", training = True):
+def predict_and_save(folder = folder, training = True):
     # create folder if not existent
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -87,7 +90,7 @@ def predict_and_save(folder = "./predictions/", training = True):
     if training:
         print("Splitting data for training...")
         train = train_df.copy()
-        train_df, test_df = split_dataset(train_df, p_test=0.5)
+        train_df, test_df = split_dataset(train_df, p_test=0.5, min_num_ratings = 0)
         # folds_dict = define_folds(train_df, 5) - FOR FOLDS?
     
     # dictionary of the predictions
@@ -119,7 +122,7 @@ def predict_and_save(folder = "./predictions/", training = True):
     return predictions, test_df
 
 
-def load_predictions(folder="./predictions"):
+def load_predictions(folder=folder):
     def get_model_name(file_name):
         results = file_name.split('_predictions')
         return results[0]
@@ -138,7 +141,7 @@ def load_predictions(folder="./predictions"):
     
     return predictions
 
-def optimize(models, ground_truth, folder="./predictions_train/"):
+def optimize(models, ground_truth, folder=folder):
     t = Timer()
     t.start()
     print("Loading predictions....")
@@ -155,7 +158,27 @@ def optimize(models, ground_truth, folder="./predictions_train/"):
     print("Time: {}. Optimization done.".format(t.now()))
     t.stop()
     
-    return res
+    return res, predictions
+
+def evaluate_stacking(weights, models, predictions, ground_truth):
+    # Get stacking results
+    user_movie = predictions[['User', 'Movie']]
+    truth = pd.merge(user_movie, ground_truth, on=['User', 'Movie'], how='inner').reset_index(drop=True)
+    pred = stack(weights, predictions, models)
+    return compute_rmse(pred, truth)
+
+def stack(weights, predictions, models):
+    stacked = np.zeros(predictions.shape[0])
+    idx = 0
+    for key, model_fam in models.items():
+        for name in model_fam.keys():
+            weight = weights[idx]
+            stacked = stacked + weight * predictions[name]
+            idx = idx + 1
+    
+    pred= predictions[['User', 'Movie']].copy()
+    pred['Rating'] = stacked
+    return pred
 
 def get_best_weights(res, models, predictions, ground_truth):
     # Create best dictionnary
@@ -176,8 +199,8 @@ def get_best_weights(res, models, predictions, ground_truth):
 
 def predict(weight_dict):
     print("Predicting....")
-    predictions, _ = predict_and_save(folder="./pred_tmp/", training=False)
-    predictions = load_predictions(folder="./pred_tmp")
+    predictions, _ = predict_and_save(folder=folder_predict, training=False)
+    predictions = load_predictions(folder=folder_predict)
     print("Finished loading.")
     
     stacked = np.zeros(predictions.shape[0])
@@ -195,8 +218,9 @@ def predict(weight_dict):
 
 if __name__ == '__main__':
     models = load_models()
-    predictions, ground_truth = predict_and_save("./predictions_tr/")
-    res = optimize(models, ground_truth, folder="./predictions_tr/")
+    predictions, ground_truth = predict_and_save()
+    res, predictions_tr = optimize(models, ground_truth)
+    models = load_models()
     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
     predictions = predict(best_dict)
     submission = create_csv_submission(predictions)

@@ -18,7 +18,7 @@ def spotlight_algo(train, test, model, verbose=True):
     movie_te = np.array(test.Movie, dtype=np.int32)
     
     train_data = Interactions(user_ids=user_tr, item_ids=movie_tr, ratings=rating_tr)
-    test_data = Interactions(user_ids=user_tr, item_ids=movie_te)
+    test_data = Interactions(user_ids=user_te, item_ids=movie_te)
     
     model.fit(train_data, verbose=verbose)
     # predict
