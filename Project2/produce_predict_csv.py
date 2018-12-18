@@ -157,6 +157,7 @@ def predict_and_save(saving_folder, models, training = True):
         print("Splitting data for training...")
         train = train_df.copy()
         train_df, test_df = split_dataset(train_df, p_test=0.5, min_num_ratings = 0)
+        print("Results of split: {}; \n {}".format(train_df.head(), test_df.head()))
         # folds_dict = define_folds(train_df, 5) - FOR FOLDS?
     
     # dictionary of the predictions
@@ -185,7 +186,11 @@ def predict_and_save(saving_folder, models, training = True):
             print("Time: {}, Saving results of {}...\n".format(t.now(), model_name))
             prediction.to_csv("{}{}_predictions({}).csv".format(saving_folder, model_name, t.now()))
             predictions[model_name] = prediction
-        
+    gt_path = folder + "ground_truth({}).csv".format(t.now())
+    t.stop()
+    print("Saving ground_truth to {}".format(gt_path))
+    test_df.to_csv(gt_path)
+    
     return predictions, test_df
 
 
