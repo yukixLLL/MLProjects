@@ -1,0 +1,75 @@
+Loading baseline models...
+1 model families loaded:
+ spotlight: spotlight, ; 
+
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Splitting data for training...
+[split_dataset] Valid: (1176952, 3)
+Results of split:    User  Movie  Rating
+0  4292    161       3
+1  7913    757       4
+2  7963    418       2
+3  8809    168       2
+4  4814    416       4; 
+    User  Movie  Rating
+0  1207    877       3
+1  2337    179       3
+2  4221    971       4
+3  2306    148       5
+4  3092    188       4
+Predicting using algo: <function spotlight_algo at 0x7f1bf2b62d90>, model: spotlight...
+Time: 0:00:00.000016, predicting with model: spotlight
+Epoch 0: loss 14.60190906209394
+Epoch 1: loss 5.893727868263905
+Epoch 2: loss 1.6708175149001263
+Epoch 3: loss 1.1505665941153365
+Epoch 4: loss 1.0437297004883888
+Epoch 5: loss 1.0129782924085868
+Epoch 6: loss 1.0027078008226542
+Epoch 7: loss 0.9985716696561239
+Epoch 8: loss 0.9967643374616865
+Epoch 9: loss 0.9957586584945719
+Epoch 10: loss 0.9951492056166311
+Epoch 11: loss 0.9946952880128874
+Epoch 12: loss 0.9944984387086235
+Epoch 13: loss 0.9942296420869333
+Epoch 14: loss 0.9940280159850284
+Epoch 15: loss 0.993774312223855
+Epoch 16: loss 0.9934524727572872
+Epoch 17: loss 0.9932717025254072
+Epoch 18: loss 0.993040337387299
+Epoch 19: loss 0.9928127031784671
+Epoch 20: loss 0.9924563878046113
+Epoch 21: loss 0.9921282087527653
+Epoch 22: loss 0.9917603405002098
+Epoch 23: loss 0.9914142647324671
+Epoch 24: loss 0.9909654990804356
+Epoch 25: loss 0.9905164033083773
+Epoch 26: loss 0.9899343778745876
+Epoch 27: loss 0.9893137966616873
+Epoch 28: loss 0.9887398494850713
+Epoch 29: loss 0.9878018177452684
+Epoch 30: loss 0.9870400591330095
+Epoch 31: loss 0.9861932229923134
+Epoch 32: loss 0.9850256492542983
+Epoch 33: loss 0.983814299884388
+Epoch 34: loss 0.9824076096043995
+Epoch 35: loss 0.980736108876768
+Epoch 36: loss 0.9790403794443778
+Epoch 37: loss 0.9769902845318807
+Epoch 38: loss 0.9748125654710486
+Epoch 39: loss 0.9721444098002603
+Epoch 40: loss 0.9692825109298046
+Epoch 41: loss 0.965973303208096
+Epoch 42: loss 0.962353393921597
+Epoch 43: loss 0.9584195473081083
+Epoch 44: loss 0.9539499746918315
+Epoch 45: loss 0.9487962505774894
+Epoch 46: loss 0.9432663841058815
+Epoch 47: loss 0.9373075805730848
+Epoch 48: loss 0.930540888529334
+Epoch 49: loss 0.9234084988117426
+Time: 1:13:39.120300, Saving results of spotlight...
+
+Saving ground_truth to ./predict_save/ground_truth(1:13:41.384266).csv
