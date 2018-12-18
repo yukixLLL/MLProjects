@@ -1,12 +1,12 @@
 from keras.models import Model
 from keras.callbacks import ModelCheckpoint
-from keras.layers import dot, concatenate, Embedding, Input, Flatten, Dropout, Dense
+from keras.layers import dot, concatenate, Embedding, Input, Flatten, Dropout, Dense, EarlyStopping
 import numpy as np
 # from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
 import pandas as pd
 
-EMBEDDING_SIZE = 100
+EMBEDDING_SIZE = 20
 VERBOSE = 1
 
 
@@ -81,9 +81,10 @@ class CollaborativeFilteringV1(object):
 
         weight_file_path = CollaborativeFilteringV1.get_weight_file_path(model_dir_path)
         checkpoint = ModelCheckpoint(weight_file_path)
+        stop = EarlyStopping(monitor='val_loss', min_delta=0.001, patience=2, mode='min')
         history = self.model.fit([user_id_train, item_id_train], rating_train,
                                  batch_size=batch_size, epochs=epoches, validation_split=validation_split,
-                                 shuffle=True, verbose=VERBOSE, callbacks=[checkpoint])
+                                 shuffle=True, verbose=VERBOSE, callbacks=[checkpoint, stop])
         self.model.save_weights(weight_file_path)
 
         return history
@@ -157,7 +158,8 @@ class CollaborativeFilteringV2(object):
         y = Dense(1)(x)
 
         model = Model(inputs=[user_id_input, item_id_input], outputs=[y])
-        model.compile(optimizer='adam', loss='mae')
+#         model.compile(optimizer='adam', loss='mae')
+        model.compile(optimizer='adam', loss='mean_squared_error')
 
         return model
 
@@ -192,9 +194,12 @@ class CollaborativeFilteringV2(object):
 
     def evaluate(self, user_id_test, item_id_test, rating_test):
         test_preds = self.model.predict([user_id_test, item_id_test]).squeeze()
-        mae = mean_absolute_error(test_preds, rating_test)
-        print("Final test MAE: %0.3f" % mae)
-        return {'mae': mae}
+#         mae = mean_absolute_error(test_preds, rating_test)
+#         print("Final test MAE: %0.3f" % mae)
+#         return {'mae': mae}
+        mse = mean_squared_error(test_preds, rating_test)
+        print("Final test MSE: %0.3f" % mse)
+        return {'mse': mse}
 
     def predict_single(self, user_id, item_id):
         predicted = self.model.predict([pd.Series([user_id]), pd.Series([item_id])])[0][0]
