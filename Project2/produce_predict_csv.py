@@ -5,6 +5,7 @@ from surprise_helpers import *
 from spotlight_helpers import *
 from pyfm_helpers import *
 import scipy.optimize as sco
+from MFRR import *
 
 from os import listdir
 from os.path import isfile, join
