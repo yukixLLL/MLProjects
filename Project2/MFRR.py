@@ -82,7 +82,7 @@ def mf_rr_algo(train_df,test_df, model):
     
     rating = train_df.pivot(index="User",columns="Movie",values="Rating")
     
-    user_features,movie_features = MF_RR(train_df,rating,num_features,lambda_,iterations=20)
+    user_features,movie_features = MF_RR(train_df,rating,num_features,lambda_,iterations=50)
     
     pred = user_features.dot(movie_features.T)
     pred[pred > 5] = 5
