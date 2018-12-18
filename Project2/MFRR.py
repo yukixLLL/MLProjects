@@ -15,6 +15,7 @@ def update_user_features(W,Z,train_df,lambda_,num_users):
     for i in range(1,num_users+1):
         X = user_ft_data.loc[i,user_ft_data.columns!='Rating']
         y = user_ft_data.loc[i,'Rating']
+        print(y.shape)
         model.fit(X,y)
         W.loc[i,:] = model.coef_
     return W
