@@ -394,7 +394,7 @@ def run_cross_validation(intest=0,seed=988):
     print("RMSE on test data after ALS: {}.".format(test_rmse))
 
 
-def als_algo(model,train_df,test_df):
+def als_algo(train_df,test_df, model):
     train_users = train_df['User'].values
     train_movies = train_df['Movie'].values
     
