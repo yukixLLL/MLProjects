@@ -131,7 +131,7 @@ def load_pyfm_models():
     print(model_msg)
     return models_dict
    
-def load_mrff_models():    
+def load_mfrr_models():    
     print("Loading baseline models...")
     models_dict = dict(
 #         # mrff
