@@ -24,7 +24,7 @@ class Timer:
         time_taken = datetime.timedelta(seconds=time.time() - self.t).__str__()
         return time_taken
 
-def load_dataset(path, min_num_ratings = 10):
+def load_dataset(path, min_num_ratings = 0):
     """Load dataset as a (User, Movie, Rating) pandas dataframe"""
     df = pd.read_csv(path)
     parsed_df = pd.DataFrame()
@@ -45,7 +45,7 @@ def load_dataset(path, min_num_ratings = 10):
     
     return valid_ratings
 
-def split_dataset(df, p_test=0.2, min_num_ratings = 10, verbose=False):
+def split_dataset(df, p_test=0.2, min_num_ratings = 0, verbose=False):
     """ split dataframe into train and test set """
     # select user and item based on the condition.
     user_counts = df.User.value_counts()
