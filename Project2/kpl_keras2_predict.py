@@ -14,8 +14,8 @@ item_id_test = all_ratings['Movie']
 rating_test = all_ratings['Rating']
 
 cf = CollaborativeFilteringV2()
-cf.load_model(CollaborativeFilteringV1.get_config_file_path(trained_model_dir_path),
-              CollaborativeFilteringV1.get_weight_file_path(trained_model_dir_path))
+cf.load_model(CollaborativeFilteringV2.get_config_file_path(trained_model_dir_path),
+              CollaborativeFilteringV2.get_weight_file_path(trained_model_dir_path))
 predicted_ratings = cf.predict(user_id_test, item_id_test)
 print(predicted_ratings)
 
