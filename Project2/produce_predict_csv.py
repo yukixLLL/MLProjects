@@ -6,6 +6,7 @@ from spotlight_helpers import *
 from pyfm_helpers import *
 import scipy.optimize as sco
 from MFRR import *
+from als import *
 
 from os import listdir
 from os.path import isfile, join
@@ -149,7 +150,26 @@ def load_mfrr_models():
     model_msg = model_msg + "; \n"
     print(model_msg)
     return models_dict
-   
+
+def load_als_models():    
+    print("Loading baseline models...")
+    models_dict = dict(
+#         # mrff
+        als = dict(
+            als = None
+        ),
+
+    )
+    
+    model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
+    for i, model in models_dict.items():
+        model_msg = model_msg + "{}: ".format(i)
+        for key, value in model.items():
+            model_msg = model_msg + "{}, ".format(key)
+    model_msg = model_msg + "; \n"
+    print(model_msg)
+    return models_dict
+
     
 def load_algos():
     algo_dict = dict(
@@ -158,6 +178,7 @@ def load_algos():
         spotlight = spotlight_algo, # spotlight_algo(train, test, model, verbose=True)
         pyfm = pyfm_algo,
         mrff = mf_rr_algo,  # mf_rr_algo(train, test, model)
+        als = als_algo,
 
     )
     return algo_dict
@@ -322,12 +343,17 @@ if __name__ == '__main__':
         models = load_surprise1_models()
     elif model_chosen == 'surprise2':
         models = load_surprise2_models()
+        predict_and_save(folder_predict, models, training=False)
+        exit()
     elif model_chosen == 'spotlight':
         models = load_spotlight_models()
     elif model_chosen == 'mfrr':
         models = load_mfrr_models()
+    elif model_chosen == 'als':
+        models = load_als_models()
+        
     predictions, ground_truth = predict_and_save(folder, models)
-    predict_and_save(folder_predict, training=False)
+    predict_and_save(folder_predict, models, training=False)
 #     res, predictions_tr = optimize(models, ground_truth)
 #     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
 #     predictions = predict(best_dict)
