@@ -9,25 +9,31 @@ def compute_rmse_rr(pred, rating):
     return np.sqrt(np.mean(mse.mean(skipna=True)))
 
 def update_user_features(W,Z,train_df,lambda_,num_users):
-    user_ft_data = train_df.set_index('Movie').join(Z).sort_values('User').set_index('User')
+    user_ft_data = train_df.set_index('Movie').join(Z).sort_values('User').set_index('User').fillna(0)
     model = Ridge(fit_intercept=False,alpha = lambda_)
     
     for i in range(1,num_users+1):
-        X = user_ft_data.loc[i,user_ft_data.columns!='Rating']
-        y = user_ft_data.loc[i,['Rating']]
-        print(y.shape)
-        model.fit(X,y)
-        W.loc[i,:] = model.coef_
+        df = user_ft_data.loc[i,:]
+        try:
+            X = df.loc[:,df.columns!='Rating']
+            y = df.loc[:,['Rating']]
+    #         print(y.shape)
+            model.fit(X,y)
+            W.loc[i,:] = model.coef_
+        except:
+            W.loc[i,:] = df
     return W
 
 
 def update_movie_features(W,Z,train_df,lambda_,num_movies):
+    
     movie_ft_data = train_df.set_index('User').join(W).sort_values('Movie').set_index('Movie')
     model = Ridge(fit_intercept=False,alpha = lambda_)
     
     for i in range(1,num_movies+1):
-        X = movie_ft_data.loc[i,movie_ft_data.columns!='Rating']
-        y = movie_ft_data.loc[i,['Rating']]
+        df = movie_ft_data.loc[i,:]
+        X = df.loc[:,df.columns!='Rating']
+        y = df.loc[:,['Rating']]
         model.fit(X,y)
         Z.loc[i,:] = model.coef_
     return Z
@@ -76,7 +82,7 @@ def mf_rr_algo(train_df,test_df, model):
     
     rating = train_df.pivot(index="User",columns="Movie",values="Rating")
     
-    user_features,movie_features = MF_RR(train_df,rating,num_features,lambda_,iterations=20)
+    user_features,movie_features = MF_RR(train_df,rating,num_features,lambda_,iterations=50)
     
     pred = user_features.dot(movie_features.T)
     pred[pred > 5] = 5
