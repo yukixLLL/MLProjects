@@ -14,7 +14,7 @@ def update_user_features(W,Z,train_df,lambda_,num_users):
     
     for i in range(1,num_users+1):
         X = user_ft_data.loc[i,user_ft_data.columns!='Rating']
-        y = user_ft_data.loc[i,'Rating']
+        y = user_ft_data.loc[i,['Rating']]
         print(y.shape)
         model.fit(X,y)
         W.loc[i,:] = model.coef_
@@ -27,7 +27,7 @@ def update_movie_features(W,Z,train_df,lambda_,num_movies):
     
     for i in range(1,num_movies+1):
         X = movie_ft_data.loc[i,movie_ft_data.columns!='Rating']
-        y = movie_ft_data.loc[i,'Rating']
+        y = movie_ft_data.loc[i,['Rating']]
         model.fit(X,y)
         Z.loc[i,:] = model.coef_
     return Z
