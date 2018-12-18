@@ -343,12 +343,15 @@ if __name__ == '__main__':
         models = load_surprise1_models()
     elif model_chosen == 'surprise2':
         models = load_surprise2_models()
+        predict_and_save(folder_predict, training=False)
+        exit()
     elif model_chosen == 'spotlight':
         models = load_spotlight_models()
     elif model_chosen == 'mfrr':
         models = load_mfrr_models()
     elif model_chosen == 'als':
         models = load_als_models()
+        
     predictions, ground_truth = predict_and_save(folder, models)
     predict_and_save(folder_predict, training=False)
 #     res, predictions_tr = optimize(models, ground_truth)
