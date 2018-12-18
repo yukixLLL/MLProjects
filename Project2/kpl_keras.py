@@ -7,6 +7,8 @@ data_dir_path = "./datas/data_train.csv"
 output_dir_path = './models'
 records = load_dataset(data_dir_path)
 
+ratings_train, ratings_test = train_test_split(records, test_size=0.2, random_state=0)
+
 user_id_train = ratings_train["User"]
 item_id_train = ratings_train["Movie"]
 rating_train = ratings_train["Rating"]
@@ -26,6 +28,8 @@ cf = CollaborativeFilteringV1()
 history = cf.fit(config=config, user_id_train=user_id_train,
                  item_id_train=item_id_train,
                  rating_train=rating_train,
+	         epoches=20,
+		 batch_size=5,
                  model_dir_path=output_dir_path)
 
 metrics = cf.evaluate(user_id_test=user_id_test,
