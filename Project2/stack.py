@@ -50,6 +50,9 @@ def load_models():
                                    use_cuda=torch.cuda.is_available()),
         ),
         # als
+        als = dict(
+            als= None
+        ),
         
         # pyfm
         pyfm = dict(
@@ -78,6 +81,7 @@ def load_algos():
         spotlight = spotlight_algo, # spotlight_algo(train, test, model, verbose=True)
         pyfm = pyfm_algo, 
         mrff = mf_rr_algo,  # mf_rr_algo(train, test, model)
+        als = als_algo,
     )
     return algo_dict
 algos = load_algos()
@@ -208,7 +212,7 @@ def get_best_weights(res, models, predictions, ground_truth):
 
 def predict(weight_dict):
     print("Predicting....")
-    predictions, _ = predict_and_save(folder_predict, training=False)
+#     predictions, _ = predict_and_save(folder_predict, training=False)
     predictions = load_predictions(folder_predict)
     print("Finished loading.")
     
@@ -227,10 +231,11 @@ def predict(weight_dict):
 
 if __name__ == '__main__':
     models = load_models()
+    # Predict & save in advance
 #     predictions, ground_truth = predict_and_save(folder)
+#     _, _ = predict_and_save(folder_predict, training=False)
     ground_truth = pd.read_csv(folder + "ground_truth.csv")
     res, predictions_tr = optimize(models, ground_truth, folder = folder)
-    models = load_models()
     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
     predictions = predict(best_dict)
     submission = create_csv_submission(predictions)
