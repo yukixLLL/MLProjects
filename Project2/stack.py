@@ -10,7 +10,7 @@ from os import listdir
 from os.path import isfile, join
 import shutil
 
-folder = "./train/"
+folder = "./predict_save/"
 folder_predict = "./train_predictions/"
 
 def load_models():
@@ -35,7 +35,7 @@ def load_models():
 #         surprise
         surprise = dict(
             surprise_svd = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
-            surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
+#             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
             surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
         ),
 #         spotlight
@@ -57,7 +57,10 @@ def load_models():
                           learning_rate_schedule="optimal")
         ),
         # keras
-        # MF
+        # MFRR
+        mfrr = dict(
+            mfrr=none
+        )
     )
     
     model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
@@ -72,7 +75,8 @@ def load_algos():
         baseline = baseline_algo, # baseline_algo(train, test, model)
         surprise = surprise_algo, # surprise_algo(train, test, algo, verbose=True, training=False)
         spotlight = spotlight_algo, # spotlight_algo(train, test, model, verbose=True)
-        pyfm = pyfm_algo,
+        pyfm = pyfm_algo, 
+        mrff = mf_rr_algo,  # mf_rr_algo(train, test, model)
     )
     return algo_dict
 algos = load_algos()
@@ -130,7 +134,8 @@ def load_predictions(reading_folder):
         results = file_name.split('_predictions')
         return results[0]
         
-    pred_array = [f for f in listdir(reading_folder) if isfile(join(reading_folder, f))]
+    pred_array = [f for f in listdir(reading_folder) if (isfile(join(reading_folder, f)) and "ground_truth" not in f)]
+    print("[load_predictions] files: {}".format(pred_array)) 
     # Set user, col indices
     predictions = pd.read_csv(join(reading_folder, pred_array[0]), index_col=0).copy().reset_index(drop=True)
     predictions = predictions.drop(['Rating'], axis=1)
@@ -147,7 +152,7 @@ def load_predictions(reading_folder):
 def optimize(models, ground_truth, folder=folder):
     t = Timer()
     t.start()
-    print("Loading predictions....")
+    print("Loading predictions from {}....".format(folder))
     predictions = load_predictions(folder)
     print("Time: {}, Finished loading.".format(t.now()))
     t.stop(verbose= False)
@@ -221,8 +226,9 @@ def predict(weight_dict):
 
 if __name__ == '__main__':
     models = load_models()
-    predictions, ground_truth = predict_and_save(folder)
-    res, predictions_tr = optimize(models, ground_truth)
+#     predictions, ground_truth = predict_and_save(folder)
+    ground_truth = pd.read_csv(folder + "ground_truth.csv")
+    res, predictions_tr = optimize(models, ground_truth, folder = folder)
     models = load_models()
     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
     predictions = predict(best_dict)
