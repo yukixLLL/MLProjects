@@ -136,7 +136,7 @@ def load_mfrr_models():
     models_dict = dict(
 #         # mrff
         mrff = dict(
-            mrff=none
+            mrff= None
         ),
 
     )

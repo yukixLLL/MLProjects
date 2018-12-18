@@ -60,7 +60,7 @@ def load_models():
         # keras
         # MFRR
         mfrr = dict(
-            mfrr=none
+            mfrr= None
         )
     )
     
