@@ -58,8 +58,8 @@ class CollaborativeFilteringV1(object):
         y = dot([user_vecs, item_vecs], axes=1)
 
         model = Model(inputs=[user_id_input, item_id_input], outputs=[y])
-#         model.compile(optimizer='adam', loss='mae')
-        model.compile(optimizer='adam', loss='mean_squared_error')
+        model.compile(optimizer='adam', loss='mae')
+#         model.compile(optimizer='adam', loss='mean_squared_error')
 
         return model
 
@@ -158,8 +158,8 @@ class CollaborativeFilteringV2(object):
         y = Dense(1)(x)
 
         model = Model(inputs=[user_id_input, item_id_input], outputs=[y])
-#         model.compile(optimizer='adam', loss='mae')
-        model.compile(optimizer='adam', loss='mean_squared_error')
+        model.compile(optimizer='adam', loss='mae')
+#         model.compile(optimizer='adam', loss='mean_squared_error')
 
         return model
 
