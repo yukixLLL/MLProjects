@@ -59,7 +59,7 @@ def split_dataset(df, p_test=0.2, min_num_ratings = 0, verbose=False):
     # Split data
     size = valid_ratings.shape[0]
     indexes = list(range(size))
-    np.random.shuffle(indexes)
+    np.random.RandomState(seed=998).shuffle(indexes)
     
     test_ind = indexes[:int(size*p_test)]
     train_ind = indexes[int(size*p_test):]
