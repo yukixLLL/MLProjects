@@ -68,7 +68,7 @@ def MF_RR(train_tr, rating,num_features,lambda_,iterations=20):
 #     print("MF-RR Final training RMSE : {err}".format(err=train_rmse))
     return W,Z
 
-def mf_rr_algo(model,train_df,test_df):
+def mf_rr_algo(train_df,test_df, model):
     
     num_features = 20
     lambda_ = 19
