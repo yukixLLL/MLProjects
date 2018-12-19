@@ -186,7 +186,7 @@ def load_predictions(reading_folder):
     
     return predictions
 
-def optimize(models, ground_truth, folder=folder):
+def optimize(models, ground_truth, folder):
     t = Timer()
     t.start()
     print("Loading predictions from {}....".format(folder))
@@ -269,7 +269,7 @@ if __name__ == '__main__':
 #     predictions, ground_truth = predict_and_save(folder)
 #     _, _ = predict_and_save(folder_predict, training=False)
     ground_truth = pd.read_csv(folder + "ground_truth.csv")
-    res, predictions_tr = optimize(models, ground_truth, folder = folder)
+    res, predictions_tr = optimize(models, ground_truth, folder)
     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
     predictions = predict(best_dict)
     submission = create_csv_submission(predictions)
