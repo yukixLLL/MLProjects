@@ -39,6 +39,12 @@ def load_models():
 #             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
             surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
         ),
+        surprise_algo_user_std = dict(
+            surprise_svd_user_std = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
+#             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
+            surprise_knn_user_std = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
+        ),
+        
 #         spotlight
         spotlight = dict(
             spotlight=ExplicitFactorizationModel(loss='regression',
@@ -49,9 +55,24 @@ def load_models():
                                    learning_rate=0.0001,
                                    use_cuda=torch.cuda.is_available()),
         ),
+
+        spotlight_user_std = dict(
+            spotlight_user_std=ExplicitFactorizationModel(loss='regression',
+                                   embedding_dim=150,  # latent dimensionality
+                                   n_iter=50,  # number of epochs of training
+                                   batch_size=256,  # minibatch size
+                                   l2=1e-5,  # strength of L2 regularization
+                                   learning_rate=0.0001,
+                                   use_cuda=torch.cuda.is_available()),
+        ),
+        
         # als
         als = dict(
             als= None
+        ),
+        
+        als_user_std = dict(
+            als_user_std = None
         ),
         
         # pyfm
@@ -60,10 +81,20 @@ def load_models():
                           task="regression", initial_learning_rate=0.001, 
                           learning_rate_schedule="optimal")
         ),
-        # keras
+        
+        pyfm_user_std = dict(
+            pyfm_user_std = pylibfm.FM(num_factors=20, num_iter=200, verbose=True, 
+                          task="regression", initial_learning_rate=0.001, 
+                          learning_rate_schedule="optimal")
+        ),
+        
         # MFRR
         mfrr = dict(
             mfrr= None
+        ),
+        
+        mfrr_user_std = dict(
+            mfrr_user_std = None
         )
     )
     
@@ -78,14 +109,17 @@ def load_algos():
     algo_dict = dict(
         baseline = baseline_algo, # baseline_algo(train, test, model)
         surprise = surprise_algo, # surprise_algo(train, test, algo, verbose=True, training=False)
+        surprise_user_std = surprise_algo_user_std,
         spotlight = spotlight_algo, # spotlight_algo(train, test, model, verbose=True)
-        pyfm = pyfm_algo, 
+        spotlight_user_std = spotlight_algo_user_std, # spotlight_algo(train, test, model, verbose=True)
+        pyfm = pyfm_algo,
+        pyfm_user_std = pyfm_algo_user_std, 
         mrff = mf_rr_algo,  # mf_rr_algo(train, test, model)
+        mrff_user_std = mf_rr_algo_user_std,  # mf_rr_algo(train, test, model)
         als = als_algo,
+        als_user_std = als_algo_user_std,
     )
     return algo_dict
-algos = load_algos()
-
 
 def predict_and_save(saving_folder, training = True):
     # create folder 

@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from helpers import *
 from sklearn.linear_model import Ridge
+from baseline_helpers import user_habit_standardize, user_habit_standardize_recover
 
 def compute_rmse_rr(pred, rating):
     err = rating - pred

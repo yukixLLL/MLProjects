@@ -7,6 +7,7 @@ from pyfm_helpers import *
 import scipy.optimize as sco
 from MFRR import *
 from als import *
+from stack import load_algos
 
 from os import listdir
 from os.path import isfile, join
@@ -43,7 +44,7 @@ def load_baseline_models():
     return models_dict
 
 def load_surprise1_models():    
-    print("Loading baseline models...")
+    print("Loading load_surprise1_models models...")
     models_dict = dict(
 #         surprise
         surprise = dict(
@@ -62,13 +63,13 @@ def load_surprise1_models():
     print(model_msg)
     return models_dict
 
-def load_surprise1_rescaled_models():    
-    print("Loading baseline models...")
+def load_surprise1_user_std_models():    
+    print("Loading surprise1_user_std models...")
     models_dict = dict(
 #         surprise
-        surprise_rescaled = dict(
-            surprise_svd = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),           
-            surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
+        surprise1_user_std = dict(
+            surprise_svd_user_std = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),           
+            surprise_knn_user_std = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
 #             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
         )
     )
@@ -83,7 +84,7 @@ def load_surprise1_rescaled_models():
     return models_dict
 
 def load_surprise2_models():    
-    print("Loading baseline models...")
+    print("Loading surprise2 models...")
     models_dict = dict(
 #         surprise
         surprise = dict(
@@ -103,7 +104,7 @@ def load_surprise2_models():
     return models_dict
 
 def load_spotlight_models():    
-    print("Loading baseline models...")
+    print("Loading spotlight models...")
     models_dict = dict(
 # #         spotlight
         spotlight = dict(
@@ -125,10 +126,33 @@ def load_spotlight_models():
     model_msg = model_msg + "; \n"
     print(model_msg)
     return models_dict
-#         # als
+
+def load_spotlight_user_std_models():    
+    print("Loading spotlight_user_std models...")
+    models_dict = dict(
+# #         spotlight
+        spotlight_user_std = dict(
+            spotlight_user_std=ExplicitFactorizationModel(loss='regression',
+                                   embedding_dim=150,  # latent dimensionality
+                                   n_iter=50,  # number of epochs of training
+                                   batch_size=256,  # minibatch size
+                                   l2=1e-5,  # strength of L2 regularization
+                                   learning_rate=0.0001,
+                                   use_cuda=torch.cuda.is_available()),
+        ),
+    )
+    
+    model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
+    for i, model in models_dict.items():
+        model_msg = model_msg + "{}: ".format(i)
+        for key, value in model.items():
+            model_msg = model_msg + "{}, ".format(key)
+    model_msg = model_msg + "; \n"
+    print(model_msg)
+    return models_dict
 
 def load_pyfm_models():    
-    print("Loading baseline models...")
+    print("Loading pyfm models...")
     models_dict = dict(
 #         # pyfm
         pyfm = dict(
@@ -148,6 +172,26 @@ def load_pyfm_models():
     model_msg = model_msg + "; \n"
     print(model_msg)
     return models_dict
+
+def load_pyfm_user_std_models():    
+    print("Loading pyfm_user_std models...")
+    models_dict = dict(
+#         # pyfm
+        pyfm_user_std = dict(
+            pyfm_user_std=pylibfm.FM(num_factors=20, num_iter=200, verbose=True, 
+                          task="regression", initial_learning_rate=0.001, 
+                          learning_rate_schedule="optimal")
+        ),
+    )
+    
+    model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
+    for i, model in models_dict.items():
+        model_msg = model_msg + "{}: ".format(i)
+        for key, value in model.items():
+            model_msg = model_msg + "{}, ".format(key)
+    model_msg = model_msg + "; \n"
+    print(model_msg)
+    return models_dict
    
 def load_mfrr_models():    
     print("Loading baseline models...")
@@ -155,6 +199,25 @@ def load_mfrr_models():
 #         # mrff
         mrff = dict(
             mrff= None
+        ),
+
+    )
+    
+    model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
+    for i, model in models_dict.items():
+        model_msg = model_msg + "{}: ".format(i)
+        for key, value in model.items():
+            model_msg = model_msg + "{}, ".format(key)
+    model_msg = model_msg + "; \n"
+    print(model_msg)
+    return models_dict
+
+def load_mfrr_user_std_models():    
+    print("Loading baseline models...")
+    models_dict = dict(
+#         # mrff
+        mrff_user_std = dict(
+            mrff_user_std = None
         ),
 
     )
@@ -187,19 +250,24 @@ def load_als_models():
     print(model_msg)
     return models_dict
 
-    
-def load_algos():
-    algo_dict = dict(
-        baseline = baseline_algo, # baseline_algo(train, test, model)
-        surprise = surprise_algo, # surprise_algo(train, test, algo, verbose=True, training=False)
-        spotlight = spotlight_algo, # spotlight_algo(train, test, model, verbose=True)
-        pyfm = pyfm_algo,
-        mrff = mf_rr_algo,  # mf_rr_algo(train, test, model)
-        als = als_algo,
-        surprise_rescaled = surprise_algo_rescaled,
+def load_als_user_std_models():    
+    print("Loading baseline models...")
+    models_dict = dict(
+#         # mrff
+        als_user_std = dict(
+            als_user_std = None
+        ),
+
     )
-    return algo_dict
-algos = load_algos()
+    
+    model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
+    for i, model in models_dict.items():
+        model_msg = model_msg + "{}: ".format(i)
+        for key, value in model.items():
+            model_msg = model_msg + "{}, ".format(key)
+    model_msg = model_msg + "; \n"
+    print(model_msg)
+    return models_dict
 
 
 def predict_and_save(saving_folder, models, training = True):
@@ -244,10 +312,10 @@ def predict_and_save(saving_folder, models, training = True):
             else:
                 prediction = algo(train_df, test_df, model)
             print("Time: {}, Saving results of {}...\n".format(t.now(), model_name))
-            prediction.to_csv("{}{}_predictions({}).csv".format(saving_folder, model_name, t.now()))
+            prediction.to_csv("{}{}_predictions_{}.csv".format(saving_folder, model_name, t.now()))
             predictions[model_name] = prediction
     if training:
-        gt_path = saving_folder + "ground_truth({}).csv".format(t.now())
+        gt_path = saving_folder + "ground_truth_{}.csv".format(t.now())
         print("Saving ground_truth to {}".format(gt_path))
         test_df.to_csv(gt_path)
         
@@ -352,9 +420,16 @@ def load_predictions(reading_folder):
 
 
 if __name__ == '__main__':
-    model_chosen = sys.argv[1] 
-    folder = "./predict_save/"
-    folder_predict = "./train_predictions/"
+    std = sys.argv[1]
+    model_chosen = sys.argv[2] 
+    
+    if std == 'std':
+        folder = "./user_std_predict_save/"
+        folder_predict = "./user_std_train_predictions/"
+    elif std == 'none':
+        folder = "./predict_save/"
+        folder_predict = "./train_predictions/"
+        
     if model_chosen == 'pyfm':
         models = load_pyfm_models()
     elif model_chosen == 'baseline':
@@ -371,10 +446,15 @@ if __name__ == '__main__':
         models = load_mfrr_models()
     elif model_chosen == 'als':
         models = load_als_models()
-    elif model_chosen == 'surprise1_rescaled':
-        folder = "./rescaled_predict_save/"
-        folder_predict = "./rescaled_train_predictions/"
-        models = load_surprise1_rescaled_models()
+    elif model_chosen == 'surprise1_user_std':
+        models = load_surprise1_user_std_models()
+    elif model_chosen == 'spotlight_user_std':
+        models = load_spotlight_user_std_models()
+    elif model_chosen == 'mfrr_user_std':
+        models = load_mfrr_user_std_models()
+    elif model_chosen == 'als_user_std':
+        models = load_als_user_std_models()
+ 
         
     predictions, ground_truth = predict_and_save(folder, models)
     predict_and_save(folder_predict, models, training=False)

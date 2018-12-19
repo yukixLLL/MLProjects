@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import os 
 from constants import *
-from baseline_helpers import *
+from baseline_helpers import user_habit_standardize, user_habit_standardize_recover
 
 def prepare_surprise_data(train, test, folder="./datas/tmp/"):
     """Save as a (User, Movie, Rating) pandas dataframe without column names"""
@@ -48,9 +48,9 @@ def surprise_algo(train, test, algo, verbose=True, training=False):
     
     return pred
 
-def surprise_algo_rescaled(train, test, algo, verbose=True, training=False):
-    train_rescaled = user_habit_standardize(train)
-    pred = surprise_algo(train_rescaled, test, algo)
+def surprise_algo_user_std(train, test, algo, verbose=True, training=False):
+    train_user_std = user_habit_standardize(train)
+    pred = surprise_algo(train_user_std, test, algo)
     # recover 
     pred_recovered = user_habit_standardize_recover(train, pred)
     

@@ -1,9 +1,10 @@
-from helpers import create_csv_submission, load_dataset
+from helpers import create_csv_submission, load_dataset 
 import pandas as pd
 import numpy as np
 from constants import *
 from pyfm import pylibfm
 from sklearn.feature_extraction import DictVectorizer
+from baseline_helpers import user_habit_standardize, user_habit_standardize_recover
 
 def toPyFMData(df):
     """Transform pandas dataframe into the dataformat PyFM needs"""
@@ -31,3 +32,10 @@ def pyfm_algo(train_df, test_df, model):
     
     return predictions
     
+def pyfm_algo_user_std(train_df, test_df, model):
+    train_user_std = user_habit_standardize(train_df)
+    pred = pyfm_algo(train_user_std, test_df, model)
+    # recover 
+    pred_recovered = user_habit_standardize_recover(train, pred)
+    
+    return pred_recovered
