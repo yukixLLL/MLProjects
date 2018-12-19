@@ -6,6 +6,7 @@ from itertools import groupby
 import pandas as pd
 import os
 from helpers import *
+from baseline_helpers import user_habit_standardize, user_habit_standardize_recover
 
 def read_txt(path):
     """read text file from path."""
@@ -429,4 +430,11 @@ def als_algo(train_df,test_df, model):
     
     return prediction
 
+def als_algo_user_std(train_df,test_df, model):
+    train_user_std = user_habit_standardize(train_df)
+    pred = als_algo(train_user_std, test_df, model)
+    # recover 
+    pred_recovered = user_habit_standardize_recover(train, pred)
+    
+    return pred_recovered
 

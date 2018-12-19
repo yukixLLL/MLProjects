@@ -1,0 +1,59 @@
+Loading baseline models...
+1 model families loaded:
+ mrff: mrff, ; 
+
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Splitting data for training...
+[split_dataset] Valid: (1176952, 3)
+Results of split:    User  Movie  Rating
+0  4292    161       3
+1  7913    757       4
+2  7963    418       2
+3  8809    168       2
+4  4814    416       4; 
+    User  Movie  Rating
+0  1207    877       3
+1  2337    179       3
+2  4221    971       4
+3  2306    148       5
+4  3092    188       4
+Predicting using algo: <function mf_rr_algo at 0x7fb3a84c9f28>, model: mrff...
+Time: 0:00:00.000015, predicting with model: mrff
+MF-RR training RMSE : 0.9874002139826233
+MF-RR training RMSE : 0.9730019597120123
+MF-RR training RMSE : 0.9610431859157074
+MF-RR training RMSE : 0.9538748960592358
+MF-RR training RMSE : 0.9496580236947757
+MF-RR training RMSE : 0.9472230575395597
+MF-RR training RMSE : 0.9458460093841445
+MF-RR training RMSE : 0.945123430129665
+MF-RR training RMSE : 0.9448243686586663
+MF-RR training RMSE : 0.9448185536689674
+Converge!
+Time: 0:06:13.631912, Saving results of mrff...
+
+Saving ground_truth to ./predict_save/ground_truth(0:06:16.123631).csv
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Predicting using algo: <function mf_rr_algo at 0x7fb3a84c9f28>, model: mrff...
+Time: 0:00:00.000033, predicting with model: mrff
+MF-RR training RMSE : 0.9835127151687743
+MF-RR training RMSE : 0.9622066565002085
+MF-RR training RMSE : 0.9490801513106307
+MF-RR training RMSE : 0.942360850434556
+MF-RR training RMSE : 0.9387143788090699
+MF-RR training RMSE : 0.936507813653716
+MF-RR training RMSE : 0.9350942948466463
+MF-RR training RMSE : 0.934162595364439
+MF-RR training RMSE : 0.9335395348027704
+MF-RR training RMSE : 0.9331231426007374
+MF-RR training RMSE : 0.9328496226104991
+MF-RR training RMSE : 0.9326779073260394
+MF-RR training RMSE : 0.9325810978737776
+MF-RR training RMSE : 0.9325396813019604
+MF-RR training RMSE : 0.9325396764580297
+Converge!
+Time: 0:15:22.918772, Saving results of mrff...
+
+Saving ground_truth to ./predict_save/ground_truth(0:15:35.205238).csv

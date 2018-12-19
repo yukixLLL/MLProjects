@@ -5,6 +5,7 @@ from spotlight.evaluation import rmse_score
 from spotlight.factorization.explicit import ExplicitFactorizationModel
 import torch
 from constants import *
+from baseline_helpers import user_habit_standardize, user_habit_standardize_recover
 
 # -----------Time: 0:11:05.077740, Loss: regression, n_iter: 50, l2: 1e-05, batch_size: 256, learning_rate: 0.0001, embedding_dim: 150, rmse: 0.9847699999809265-------------
 
@@ -30,3 +31,11 @@ def spotlight_algo(train, test, model, verbose=True):
     predictions_df['Rating'] = predictions
     
     return predictions_df
+
+def spotlight_algo_user_std(train, test, model, verbose=True):
+    train_user_std = user_habit_standardize(train)
+    pred = spotlight_algo(train_user_std, test, model, verbose)
+    # recover 
+    pred_recovered = user_habit_standardize_recover(train, pred)
+    
+    return pred_recovered
