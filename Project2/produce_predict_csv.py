@@ -454,6 +454,8 @@ if __name__ == '__main__':
         models = load_mfrr_user_std_models()
     elif model_chosen == 'als_user_std':
         models = load_als_user_std_models()
+    elif model_chosen == 'pyfm_user_std':
+        models = load_pyfm_user_std_models()
  
         
     predictions, ground_truth = predict_and_save(folder, models)
