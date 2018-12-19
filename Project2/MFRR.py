@@ -106,3 +106,11 @@ def mf_rr_algo(train_df,test_df, model):
 #     prediction = create_csv_submission(test_ret)
     
     return prediction
+
+def mf_rr_algo_user_std(train_df,test_df, model):
+    train_user_std = user_habit_standardize(train_df)
+    pred = mf_rr_algo(train_user_std, test_df, model)
+    # recover 
+    pred_recovered = user_habit_standardize_recover(train, pred)
+    
+    return pred_recovered
