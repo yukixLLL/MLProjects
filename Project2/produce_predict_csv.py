@@ -67,7 +67,7 @@ def load_surprise1_user_std_models():
     print("Loading surprise1_user_std models...")
     models_dict = dict(
 #         surprise
-        surprise1_user_std = dict(
+        surprise_user_std = dict(
             surprise_svd_user_std = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),           
             surprise_knn_user_std = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
 #             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
