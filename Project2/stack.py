@@ -4,8 +4,9 @@ from baseline_helpers import *
 from surprise_helpers import *
 from spotlight_helpers import *
 from pyfm_helpers import *
-import scipy.optimize as sco
+from als import *
 from MFRR import *
+import scipy.optimize as sco
 
 from os import listdir
 from os.path import isfile, join
