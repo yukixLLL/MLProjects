@@ -12,9 +12,6 @@ from os import listdir
 from os.path import isfile, join
 import shutil
 
-folder = "./predict_save/"
-folder_predict = "./train_predictions/"
-
 def load_models():
     print("Loading models...")
     models_dict = dict(
@@ -122,51 +119,51 @@ def load_algos():
     )
     return algo_dict
 
-def predict_and_save(saving_folder, training = True):
-    # create folder 
-    if os.path.exists(saving_folder):
-        shutil.rmtree(saving_folder)
+# def predict_and_save(saving_folder, training = True):
+#     # create folder 
+#     if os.path.exists(saving_folder):
+#         shutil.rmtree(saving_folder)
     
-    os.makedirs(saving_folder)
+#     os.makedirs(saving_folder)
     
-    # load csv
-    train_df = load_dataset(train_dataset, min_num_ratings = 0)
-    test_df = load_dataset(test_dataset, min_num_ratings = 0)
+#     # load csv
+#     train_df = load_dataset(train_dataset, min_num_ratings = 0)
+#     test_df = load_dataset(test_dataset, min_num_ratings = 0)
     
-    # Split training to blend
-    if training:
-        print("Splitting data for training...")
-        train = train_df.copy()
-        train_df, test_df = split_dataset(train_df, p_test=0.5, min_num_ratings = 0)
-        # folds_dict = define_folds(train_df, 5) - FOR FOLDS?
+#     # Split training to blend
+#     if training:
+#         print("Splitting data for training...")
+#         train = train_df.copy()
+#         train_df, test_df = split_dataset(train_df, p_test=0.5, min_num_ratings = 0)
+#         # folds_dict = define_folds(train_df, 5) - FOR FOLDS?
     
-    # dictionary of the predictions
-    predictions = dict()
+#     # dictionary of the predictions
+#     predictions = dict()
         
-    # load models
-    models_dict = load_models()
-    # load algos
-    algo_dict = load_algos()
-    t = Timer()
-    t.start()
-    for model_family_name, model_family in models_dict.items():
-        algo = algo_dict[model_family_name]
-        print("Predicting using algo: {}, model: {}...".format(algo, model_family_name))
+#     # load models
+#     models_dict = load_models()
+#     # load algos
+#     algo_dict = load_algos()
+#     t = Timer()
+#     t.start()
+#     for model_family_name, model_family in models_dict.items():
+#         algo = algo_dict[model_family_name]
+#         print("Predicting using algo: {}, model: {}...".format(algo, model_family_name))
 
-        for model_name, model in model_family.items():
-            print("Time: {}, predicting with model: {}".format(t.now(), model_name))
-            if model_family == 'baseline':
-                if training:
-                    prediction = algo(train, test_df, model)
-                else: # predicting
-                    prediction = algo(train_df.copy(), test_df.copy(), model)
-            else:
-                prediction = algo(train_df, test_df, model)
-            print("Time: {}, Saving results of {}...\n".format(t.now(), model_name))
-            prediction.to_csv("{}{}_predictions({}).csv".format(saving_folder, model_name, t.now()))
-            predictions[model_name] = prediction
+#         for model_name, model in model_family.items():
+#             print("Time: {}, predicting with model: {}".format(t.now(), model_name))
+#             if model_family == 'baseline':
+#                 if training:
+#                     prediction = algo(train, test_df, model)
+#                 else: # predicting
+#                     prediction = algo(train_df.copy(), test_df.copy(), model)
+#             else:
+#                 prediction = algo(train_df, test_df, model)
+#             print("Time: {}, Saving results of {}...\n".format(t.now(), model_name))
+#             prediction.to_csv("{}{}_predictions({}).csv".format(saving_folder, model_name, t.now()))
+#             predictions[model_name] = prediction
         
-    return predictions, test_df
+#     return predictions, test_df
 
 
 def load_predictions(reading_folder):
@@ -265,6 +262,8 @@ def predict(weight_dict):
 
 
 if __name__ == '__main__':
+    folder = "./predict_save/"
+    folder_predict = "./train_predictions/"
     models = load_models()
     # Predict & save in advance
 #     predictions, ground_truth = predict_and_save(folder)

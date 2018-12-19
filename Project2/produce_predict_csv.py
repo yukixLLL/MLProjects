@@ -362,7 +362,7 @@ if __name__ == '__main__':
         models = load_surprise1_models()
     elif model_chosen == 'surprise2':
         models = load_surprise2_models()
-        predict_and_save(folder_predict, models, training=False)
+        _, _ = predict_and_save(folder_predict, models, training=False)
         exit()
     elif model_chosen == 'spotlight':
         models = load_spotlight_models()
@@ -383,7 +383,7 @@ if __name__ == '__main__':
  
         
     predictions, ground_truth = predict_and_save(folder, models)
-    predict_and_save(folder_predict, models, training=False)
+    _, _ = predict_and_save(folder_predict, models, training=False)
 #     res, predictions_tr = optimize(models, ground_truth, folder)
 #     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
 #     predictions = predict(best_dict)
