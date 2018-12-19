@@ -13,9 +13,6 @@ from os.path import isfile, join
 import shutil
 import sys
 
-folder = "./predict_save/"
-folder_predict = "./train_predictions/"
-
 def load_baseline_models():
     print("Loading baseline models...")
     models_dict = dict(
@@ -50,6 +47,26 @@ def load_surprise1_models():
     models_dict = dict(
 #         surprise
         surprise = dict(
+            surprise_svd = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),           
+            surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
+#             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
+        )
+    )
+    
+    model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
+    for i, model in models_dict.items():
+        model_msg = model_msg + "{}: ".format(i)
+        for key, value in model.items():
+            model_msg = model_msg + "{}, ".format(key)
+    model_msg = model_msg + "; \n"
+    print(model_msg)
+    return models_dict
+
+def load_surprise1_rescaled_models():    
+    print("Loading baseline models...")
+    models_dict = dict(
+#         surprise
+        surprise_rescaled = dict(
             surprise_svd = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),           
             surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
 #             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
@@ -179,7 +196,7 @@ def load_algos():
         pyfm = pyfm_algo,
         mrff = mf_rr_algo,  # mf_rr_algo(train, test, model)
         als = als_algo,
-
+        surprise_rescaled = surprise_algo_rescaled,
     )
     return algo_dict
 algos = load_algos()
@@ -229,11 +246,12 @@ def predict_and_save(saving_folder, models, training = True):
             print("Time: {}, Saving results of {}...\n".format(t.now(), model_name))
             prediction.to_csv("{}{}_predictions({}).csv".format(saving_folder, model_name, t.now()))
             predictions[model_name] = prediction
-    gt_path = folder + "ground_truth({}).csv".format(t.now())
+    if training:
+        gt_path = saving_folder + "ground_truth({}).csv".format(t.now())
+        print("Saving ground_truth to {}".format(gt_path))
+        test_df.to_csv(gt_path)
+        
     t.stop()
-    print("Saving ground_truth to {}".format(gt_path))
-    test_df.to_csv(gt_path)
-    
     return predictions, test_df
 
 
@@ -335,6 +353,8 @@ def predict(weight_dict):
 
 if __name__ == '__main__':
     model_chosen = sys.argv[1] 
+    folder = "./predict_save/"
+    folder_predict = "./train_predictions/"
     if model_chosen == 'pyfm':
         models = load_pyfm_models()
     elif model_chosen == 'baseline':
@@ -351,6 +371,10 @@ if __name__ == '__main__':
         models = load_mfrr_models()
     elif model_chosen == 'als':
         models = load_als_models()
+    elif model_chosen == 'surprise1_rescaled':
+        folder = "./rescaled_predict_save/"
+        folder_predict = "./rescaled_train_predictions/"
+        models = load_surprise1_rescaled_models()
         
     predictions, ground_truth = predict_and_save(folder, models)
     predict_and_save(folder_predict, models, training=False)
