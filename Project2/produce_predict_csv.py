@@ -197,8 +197,8 @@ def load_mfrr_models():
     print("Loading baseline models...")
     models_dict = dict(
 #         # mrff
-        mrff = dict(
-            mrff= None
+        mfrr = dict(
+            mfrr= None
         ),
 
     )
@@ -216,8 +216,8 @@ def load_mfrr_user_std_models():
     print("Loading baseline models...")
     models_dict = dict(
 #         # mrff
-        mrff_user_std = dict(
-            mrff_user_std = None
+        mfrr_user_std = dict(
+            mfrr_user_std = None
         ),
 
     )
@@ -234,7 +234,6 @@ def load_mfrr_user_std_models():
 def load_als_models():    
     print("Loading baseline models...")
     models_dict = dict(
-#         # mrff
         als = dict(
             als = None
         ),
