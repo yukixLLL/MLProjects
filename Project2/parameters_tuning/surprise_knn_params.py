@@ -1,7 +1,7 @@
 from surprise import *
 from surprise.model_selection import KFold, PredefinedKFold
 from surprise import accuracy
-from helpers import Timer
+from src.helpers import Timer
 import pandas as pd
 import numpy as np
 
@@ -22,7 +22,7 @@ def surprise_cv_algo(data, algo, k_fold=5, verbose=True):
     return rmse_mean
     
     
-def surprise_knn_best_params(train_path="datas/train.csv", test_path="datas/test.csv", verbose=True, t = Timer()):
+def surprise_knn_best_params(train_path="../datas/train.csv", test_path="../datas/test.csv", verbose=True, t = Timer()):
     # reader with rating scale
     reader = Reader(line_format='user item rating', sep=',', rating_scale=(1, 5))
     # load data from df

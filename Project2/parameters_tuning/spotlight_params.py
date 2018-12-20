@@ -1,4 +1,4 @@
-from helpers import *
+from src.helpers import *
 import pandas as pd
 from spotlight.interactions import Interactions
 from spotlight.cross_validation import random_train_test_split
@@ -6,9 +6,8 @@ from spotlight.evaluation import rmse_score
 from spotlight.factorization.explicit import ExplicitFactorizationModel
 import torch
  
-
-train_dataset = "./datas/data_train.csv"
-test_dataset = "./datas/sampleSubmission.csv"
+train_dataset = "../datas/data_train.csv"
+test_dataset = "../datas/sampleSubmission.csv"
 
 train = load_dataset(train_dataset)
 test = load_dataset(test_dataset)

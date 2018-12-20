@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from helpers import *
+from src.helpers import *
 from pyfm import pylibfm
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.model_selection import KFold
