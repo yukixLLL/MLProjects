@@ -62,8 +62,7 @@ def build_index_groups(train):
     nz_train = list(zip(nz_row, nz_col))
 
     grouped_nz_train_byrow = group_by(nz_train, index=0) # group by items 
-#     for g, value in grouped_nz_train_byrow:
-#         print("{}, {}".format(g, list(value))) #value for g=0: (0, 1) (0, 2) (0, 3) index of all the users that rated the item 0
+
     nz_row_colindices = [(g, np.array([v[1] for v in value])) # indices of all the users that rated item g
                          for g, value in grouped_nz_train_byrow]
     
@@ -106,7 +105,7 @@ def split_data(ratings, num_users_per_movie, num_movies_per_user,
         ratings.shape))
     print("the shape of valid ratings. (# of row, # of col): {}".format(
         (num_rows, num_cols)))
-
+    # get the nonzero entry index of rating matrix
     nz_users, nz_movies = valid_ratings.nonzero()
     
     # split the data
@@ -132,17 +131,17 @@ def init_MF(train, num_features,weight=1.0):
     """init the parameter for matrix factorization."""
 
     num_user,num_movie = train.shape
-
+    # initial the feature matrix
     movie_features = weight * np.random.rand(num_features,num_movie)
     user_features = weight * np.random.rand(num_features,num_user)
-
+    
     user_nnz = train.getnnz(axis=1)
     user_sum = train.sum(axis=1)
 
     return movie_features, user_features
 
 def compute_error(data, movie_features, user_features, nz):
-    """compute the loss (MSE) of the prediction of nonzero elements."""
+    """compute the loss (RMSE) of the prediction of nonzero elements."""
     # calculate rmse (we only consider nonzero entries.)
     mse = 0
     for row,col in nz:
@@ -164,6 +163,7 @@ def update_movie_feature(
     lambda_I = lambda_movie * sp.eye(num_features)
     updated_movie_features = np.zeros((num_features,num_movies))
     
+    # update the movie feature matrix one movie by one
     for movie,user in nz_movie_userindices:
         M = user_features[:,user]
         
@@ -184,6 +184,7 @@ def update_user_feature(
     lambda_I = lambda_user * sp.eye(num_features)
     updated_user_features = np.zeros((num_features,num_users))
     
+    # update the user feature matrix one user by one
     for user,movie in nz_user_movieindices:
         M = movie_features[:,movie]
         
@@ -204,8 +205,6 @@ def ALS(train,num_features,lambda_movie,lambda_user,max_weight=1.0,iterations=50
     nz_row, nz_col = train.nonzero()
     nz_train = list(zip(nz_row, nz_col))
     
-#     nz_row, nz_col = test.nonzero()
-#     nz_test = list(zip(nz_row, nz_col))
 
     # init ALS
     movie_features, user_features = init_MF(train, num_features,max_weight)
@@ -229,26 +228,26 @@ def ALS(train,num_features,lambda_movie,lambda_user,max_weight=1.0,iterations=50
 #         print("ALS training RMSE : {err}".format(err=train_rmse))
         error_list.append(train_rmse)
         change = np.fabs(error_list[-1] - error_list[-2])
+        # if change is small enough then stop
         if (change < stop_criterion):
             print("Converge!")
             break;
         it += 1
         
     print("ALS Final training RMSE : {err}".format(err=train_rmse))
-    # evaluate the error in test set
-    
-#     test_rmse = compute_error(test, movie_features, user_features, nz_test)
-#     print("RMSE on test data after ALS: {}.".format(test_rmse))   
     
     return user_features,movie_features
 
 def cv_ALS_random_search(train,test=None,seed=988):
-
+    """random search cross-validation to tune hyper-parameters"""
+    
+    # randomly generate candidate parameters from appropriate range
     movies_range = np.linspace(0.01,1,num=100)
     user_range = np.linspace(0.01,1,num=100)
     features_num_range = np.linspace(1,60,num=60,dtype=np.int32)
     weight_range = np.linspace(1.0,3.0,num=60)
-    
+    # randomly select 60 parameters to tune 
+    # because 60 iterations is enough to reach 0.95 probability to find the optimal
     lambda_movies = np.random.choice(movies_range,60)
     lambda_users = np.random.choice(user_range,60)
     nb_features = np.random.choice(features_num_range,60)
@@ -271,6 +270,7 @@ def cv_ALS_random_search(train,test=None,seed=988):
     newpath = r'./data' 
     if not os.path.exists(newpath):
         os.makedirs(newpath)
+    # initial train data and test data from training dataset for 5-fold cross-validation
     train_tr_list, test_tr_list = split_for_cv(train,p_test=0.2)
     for num_features,weight,lambda_movie,lambda_user in zip(nb_features,weights,lambda_movies,lambda_users):
         rmse_list = []
@@ -283,6 +283,7 @@ def cv_ALS_random_search(train,test=None,seed=988):
 #             print("test RMSE: {te_rmse}" .format(te_rmse=test_tr_rmse))
             rmse_list.append(test_tr_rmse)
         test_rmse = np.mean(rmse_list)
+        # save best parameters
         if(test_rmse < best_rmse):
             best_rmse = test_rmse
             bset_lambda_user = lambda_user
@@ -301,6 +302,7 @@ def cv_ALS_random_search(train,test=None,seed=988):
     return best_num_feature,best_weight,best_lambda_movie,bset_lambda_user
 
 def split_for_cv(train,p_test=0.2,k_fold=5):
+    """split training data into test data and train data for cv randomly"""
     # init
     num_rows, num_cols = train.shape
     nz_users, nz_movies = train.nonzero()
@@ -330,13 +332,14 @@ def split_for_cv(train,p_test=0.2,k_fold=5):
     return train_tr_list, test_tr_list
 
 def predict_ALS(num_features=None,lambda_movie=None,lambda_user=None,weight=None,load_File=None):
+    """just simply use to predict by ALS"""
     seed = 988
     train_dataset = "./data/data_train.csv"
     ratings = load_data(train_dataset)
     
     # set seed
     np.random.seed(seed)
-    
+    # split data
     num_users_per_movie,num_movies_per_user = get_number_per(ratings)
     valid_ratings, train, _= split_data(
     ratings, num_users_per_movie, num_movies_per_user, min_num_ratings=0, p_test=0)
@@ -352,9 +355,12 @@ def predict_ALS(num_features=None,lambda_movie=None,lambda_user=None,weight=None
 #         weight = 2.18644068
 #         lambda_movie = 0.02
 #         lambda_user = 0.47
+    # ALS
     user_features,movie_features = ALS(train,num_features,lambda_movie,lambda_user,weight)
+    # predict
     predict_labels = user_features.T @ movie_features
     predict = np.asarray(predict_labels.T)
+    # change the matrix into dataframe
     movie_user_predict = pd.DataFrame(data=predict)
     movie_user_predict.reset_index(inplace=True)
     movie_user_predict.rename(columns={"index":"Movie"},inplace=True)
@@ -362,6 +368,7 @@ def predict_ALS(num_features=None,lambda_movie=None,lambda_user=None,weight=None
     movie_user_predict_melt["Movie"] = movie_user_predict_melt["Movie"].values +1
     movie_user_predict_melt["User"] = movie_user_predict_melt["User"].values +1
     
+    # match ID in samplesubmission
     sample = pd.read_csv("./data/sampleSubmission.csv")
     movie_user_predict_melt['Id'] = movie_user_predict_melt.apply(lambda x: 'r{}_c{}'.format(int(x.User), int(x.Movie)), axis=1)
     prediction = movie_user_predict_melt[movie_user_predict_melt.Id.isin(sample.Id.values)]
@@ -371,12 +378,13 @@ def predict_ALS(num_features=None,lambda_movie=None,lambda_user=None,weight=None
 
 
 def run_cross_validation(intest=0,seed=988):
+    """Function to run the cross-validation"""
     train_dataset = "./data/data_train.csv"
     ratings = load_data(train_dataset)
     
     # set seed
     np.random.seed(seed)
-    
+    # split data
     num_users_per_movie,num_movies_per_user = get_number_per(ratings)
     valid_ratings, train, test = split_data(
     ratings, num_users_per_movie, num_movies_per_user, min_num_ratings=0, p_test=0.2)
@@ -387,7 +395,7 @@ def run_cross_validation(intest=0,seed=988):
         lambda_user = 0.02
     else:
         num_features,weight,lambda_movie,lambda_user = cv_ALS_random_search(train,test)
-        
+    # ALS    
     user_features,movie_features = ALS(train,num_features,lambda_movie,lambda_user,weight)
     nz_row, nz_col = test.nonzero()
     nz_test = list(zip(nz_row, nz_col))
@@ -396,12 +404,15 @@ def run_cross_validation(intest=0,seed=988):
 
 
 def als_algo(train_df,test_df, model):
+    """running ALS for blending"""
+    # get users and movies from train_df and test_df
     train_users = train_df['User'].values
     train_movies = train_df['Movie'].values
-    
+    # get the number of user and movie to decide the shape of matrix
     num_rows,num_cols = len(train_df['User'].value_counts()),len(train_df['Movie'].value_counts())
     train = sp.lil_matrix((num_rows, num_cols))
     test = sp.lil_matrix((num_rows, num_cols))
+    # set value in training data matrix according to training dataframe 
     for row,col in zip(train_users,train_movies):
         train[row-1,col-1] = train_df.loc[(train_df['User']==row) &(train_df['Movie']==col),'Rating'].values[0]
     
@@ -412,8 +423,10 @@ def als_algo(train_df,test_df, model):
     lambda_user = 0.47
     # ALS
     user_features,movie_features = ALS(train,num_features,lambda_movie,lambda_user,weight)
+    # predict
     predict_labels = user_features.T @ movie_features
     predict = np.asarray(predict_labels.T)
+    # change data matrix into dataframe
     movie_user_predict = pd.DataFrame(data=predict)
     movie_user_predict.reset_index(inplace=True)
     movie_user_predict.rename(columns={"index":"Movie"},inplace=True)
@@ -431,6 +444,8 @@ def als_algo(train_df,test_df, model):
     return prediction
 
 def als_algo_user_std(train_df,test_df, model):
+    """run ALS with user habit standardization"""
+    # standardize
     train_user_std = user_habit_standardize(train_df)
     pred = als_algo(train_user_std, test_df, model)
     # recover 
