@@ -43,14 +43,14 @@ def load_baseline_models():
     print(model_msg)
     return models_dict
 
-def load_surprise1_models():    
-    print("Loading load_surprise1_models models...")
+def load_surprise_models():    
+    print("Loading load_surprise_models models...")
     models_dict = dict(
 #         surprise
         surprise = dict(
             surprise_svd = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),           
             surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
-#             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
+            surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
         )
     )
     
@@ -63,34 +63,14 @@ def load_surprise1_models():
     print(model_msg)
     return models_dict
 
-def load_surprise1_user_std_models():    
-    print("Loading surprise1_user_std models...")
+def load_surprise_user_std_models():    
+    print("Loading surprise_user_std models...")
     models_dict = dict(
 #         surprise
         surprise_user_std = dict(
             surprise_svd_user_std = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),           
             surprise_knn_user_std = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
-#             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
-        )
-    )
-    
-    model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
-    for i, model in models_dict.items():
-        model_msg = model_msg + "{}: ".format(i)
-        for key, value in model.items():
-            model_msg = model_msg + "{}, ".format(key)
-    model_msg = model_msg + "; \n"
-    print(model_msg)
-    return models_dict
-
-def load_surprise2_models():    
-    print("Loading surprise2 models...")
-    models_dict = dict(
-#         surprise
-        surprise = dict(
-#             surprise_svd = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),           
-#             surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
-            surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
+            surprise_svd_pp_user_std = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
         )
     )
     
@@ -357,20 +337,16 @@ if __name__ == '__main__':
         models = load_pyfm_models()
     elif model_chosen == 'baseline':
         models = load_baseline_models()
-    elif model_chosen == 'surprise1':
-        models = load_surprise1_models()
-    elif model_chosen == 'surprise2':
-        models = load_surprise2_models()
-        _, _ = predict_and_save(folder_predict, models, training=False)
-        exit()
+    elif model_chosen == 'surprise':
+        models = load_surprise_models()
     elif model_chosen == 'spotlight':
         models = load_spotlight_models()
     elif model_chosen == 'mfrr':
         models = load_mfrr_models()
     elif model_chosen == 'als':
         models = load_als_models()
-    elif model_chosen == 'surprise1_user_std':
-        models = load_surprise1_user_std_models()
+    elif model_chosen == 'surprise_user_std':
+        models = load_surprise_user_std_models()
     elif model_chosen == 'spotlight_user_std':
         models = load_spotlight_user_std_models()
     elif model_chosen == 'mfrr_user_std':
@@ -380,11 +356,6 @@ if __name__ == '__main__':
     elif model_chosen == 'pyfm_user_std':
         models = load_pyfm_user_std_models()
  
-        
+    # prepare csv data for optimizing and predicted data for stacking    
     predictions, ground_truth = predict_and_save(folder, models)
     _, _ = predict_and_save(folder_predict, models, training=False)
-#     res, predictions_tr = optimize(models, ground_truth, folder)
-#     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
-#     predictions = predict(best_dict)
-#     submission = create_csv_submission(predictions)
-#     submission.to_csv("./predictions_tr/blended_baseline.csv")
