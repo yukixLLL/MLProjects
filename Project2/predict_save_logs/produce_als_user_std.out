@@ -1,0 +1,23 @@
+Loading baseline models...
+1 model families loaded:
+ als_user_std: als_user_std, ; 
+
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Splitting data for training...
+[split_dataset] Valid: (1176952, 3)
+Results of split:    User  Movie  Rating
+0  4292    161       3
+1  7913    757       4
+2  7963    418       2
+3  8809    168       2
+4  4814    416       4; 
+    User  Movie  Rating
+0  1207    877       3
+1  2337    179       3
+2  4221    971       4
+3  2306    148       5
+4  3092    188       4
+Predicting using algo: <function als_algo_user_std at 0x7f2d86d72f28>, model: als_user_std...
+Time: 0:00:00.000016, predicting with model: als_user_std
+ALS Final training RMSE : 0.8366683504953485

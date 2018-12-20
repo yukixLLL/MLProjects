@@ -18,17 +18,16 @@ Results of split:    User  Movie  Rating
 2  4221    971       4
 3  2306    148       5
 4  3092    188       4
-Predicting using algo: <function als_algo at 0x7f2fded758c8>, model: als...
-Time: 0:00:00.000019, predicting with model: als
-ALS Final training RMSE : 0.8370199606250176
-Time: 1:04:27.859771, Saving results of als...
+Predicting using algo: <function als_algo at 0x7f2e72dceea0>, model: als...
+Time: 0:00:00.000016, predicting with model: als
+ALS Final training RMSE : 0.8370363654141808
+Time: 2:47:30.622286, Saving results of als...
 
-Saving ground_truth to ./predict_save/ground_truth(1:04:30.211814).csv
+Saving ground_truth to ./predict_save/ground_truth_2:47:33.815013.csv
 [load_dataset] Valid: (1176952, 3)
 [load_dataset] Valid: (1176952, 3)
-Predicting using algo: <function als_algo at 0x7f2fded758c8>, model: als...
-Time: 0:00:00.000036, predicting with model: als
-ALS Final training RMSE : 0.926716574946068
-Time: 2:19:23.842784, Saving results of als...
+Predicting using algo: <function als_algo at 0x7f2e72dceea0>, model: als...
+Time: 0:00:00.000034, predicting with model: als
+ALS Final training RMSE : 0.9267534324676223
+Time: 2:58:18.655270, Saving results of als...
 
-Saving ground_truth to ./predict_save/ground_truth(2:19:28.512734).csv

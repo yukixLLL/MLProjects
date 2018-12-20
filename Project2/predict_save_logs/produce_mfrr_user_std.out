@@ -1,0 +1,72 @@
+Loading baseline models...
+1 model families loaded:
+ mrff_user_std: mrff_user_std, ; 
+
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Splitting data for training...
+[split_dataset] Valid: (1176952, 3)
+Results of split:    User  Movie  Rating
+0  4292    161       3
+1  7913    757       4
+2  7963    418       2
+3  8809    168       2
+4  4814    416       4; 
+    User  Movie  Rating
+0  1207    877       3
+1  2337    179       3
+2  4221    971       4
+3  2306    148       5
+4  3092    188       4
+Predicting using algo: <function mf_rr_algo_user_std at 0x7f5c83320510>, model: mrff_user_std...
+Time: 0:00:00.000015, predicting with model: mrff_user_std
+MF-RR training RMSE : 0.9880838580924197
+MF-RR training RMSE : 0.9738361727390369
+MF-RR training RMSE : 0.9622930483296628
+MF-RR training RMSE : 0.9551555926966214
+MF-RR training RMSE : 0.950842982228717
+MF-RR training RMSE : 0.9483734639665888
+MF-RR training RMSE : 0.9470173537150298
+MF-RR training RMSE : 0.9463373804731592
+MF-RR training RMSE : 0.9460809794082458
+MF-RR training RMSE : 0.9460958898030866
+MF-RR training RMSE : 0.946285682855748
+MF-RR training RMSE : 0.9465871657032663
+MF-RR training RMSE : 0.9469578912046915
+MF-RR training RMSE : 0.9473686671026154
+MF-RR training RMSE : 0.9477991422499095
+MF-RR training RMSE : 0.9482355417340921
+MF-RR training RMSE : 0.9486681143521014
+MF-RR training RMSE : 0.9490898939333525
+MF-RR training RMSE : 0.949496018071993
+MF-RR training RMSE : 0.9498831272410341
+MF-RR training RMSE : 0.9502489963452171
+MF-RR training RMSE : 0.9505924109188406
+MF-RR training RMSE : 0.9509128123100623
+MF-RR training RMSE : 0.9512101299588948
+MF-RR training RMSE : 0.9514846124822461
+MF-RR training RMSE : 0.9517368157630164
+MF-RR training RMSE : 0.9519676640670091
+MF-RR training RMSE : 0.9521782669885238
+MF-RR training RMSE : 0.9523698002620207
+MF-RR training RMSE : 0.9525434744464254
+MF-RR training RMSE : 0.952700528678053
+MF-RR training RMSE : 0.9528421996069864
+MF-RR training RMSE : 0.9529696615398697
+MF-RR training RMSE : 0.9530840974809971
+MF-RR training RMSE : 0.9531866480130275
+MF-RR training RMSE : 0.9532783542935822
+MF-RR training RMSE : 0.9533602143761101
+MF-RR training RMSE : 0.95343311942579
+MF-RR training RMSE : 0.9534979019974904
+MF-RR training RMSE : 0.9535553714413333
+MF-RR training RMSE : 0.9536062449652472
+MF-RR training RMSE : 0.9536511829693846
+MF-RR training RMSE : 0.9536907633582798
+MF-RR training RMSE : 0.9537255615423129
+MF-RR training RMSE : 0.9537560564581472
+MF-RR training RMSE : 0.9537827185442247
+MF-RR training RMSE : 0.9538059478593722
+MF-RR training RMSE : 0.9538260973785867
+MF-RR training RMSE : 0.9538435277989813
+MF-RR training RMSE : 0.9538585510158211
