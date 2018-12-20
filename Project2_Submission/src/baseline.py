@@ -4,6 +4,7 @@ from helpers import compute_rmse
 from baseline_helpers import *
 
 def baseline_global_mean(train, test, training=False):
+    """use the global mean to predict the rating"""
     mean = train.Rating.mean()
     pred_test = test.copy()
     pred_test.Rating = mean
@@ -14,6 +15,7 @@ def baseline_global_mean(train, test, training=False):
     return pred_test
 
 def baseline_global_median(train, test, training=False):
+    """use the global median to predict the rating"""
     median = train.Rating.median()
     pred_test = test.copy()
     pred_test.Rating = median
@@ -25,6 +27,7 @@ def baseline_global_median(train, test, training=False):
     return pred_test
 
 def baseline_user_mean(train, test, training=False):
+    """use the user mean to predict the rating"""
     mean_per_user = train.groupby('User').mean().Rating
 
     pred_test = test.copy()
@@ -42,6 +45,7 @@ def baseline_user_mean(train, test, training=False):
     return pred_test
 
 def baseline_user_median(train, test, training=False):
+    """use the user median to predict the rating"""
     median_per_user = train.groupby('User').median().Rating
 
     pred_test = test.copy()
@@ -58,6 +62,7 @@ def baseline_user_median(train, test, training=False):
     return pred_test 
 
 def baseline_movie_mean(train, test, training=False):
+    """use the movie mean to predict the rating"""
     mean_per_movie = train.groupby('Movie').mean().Rating
 
     pred_test = test.copy()
@@ -74,6 +79,7 @@ def baseline_movie_mean(train, test, training=False):
     return pred_test
 
 def baseline_movie_median(train, test, training=False):
+    """use the movie median to predict the rating"""
     median_per_movie = train.groupby('Movie').median().Rating
 
     pred_test = test.copy()
@@ -90,6 +96,11 @@ def baseline_movie_median(train, test, training=False):
     return pred_test
 
 def movie_mean_user_standardize(train, test, training=False):
+     """
+     first standardize the train data according to user
+     use the movie mean method to predic the rating
+     finally do standardize recover
+     """
     stand_train = user_standardize(train)
     stand_pred_test = baseline_movie_mean(stand_train, test)
 
@@ -104,6 +115,11 @@ def movie_mean_user_standardize(train, test, training=False):
     return pred_test
 
 def movie_median_user_standardize(train, test, training=False):
+     """
+     first standardize the train data according to user
+     use the movie median method to predic the rating
+     finally do standardize recover
+     """
     #standardize the rating according to per user mean and variance
     stand_train = user_standardize(train)
 
@@ -121,6 +137,11 @@ def movie_median_user_standardize(train, test, training=False):
     return pred_test
 
 def movie_mean_user_habit_standardize(train, test, training=False):
+     """
+     first standardize the train data according to user habit
+     use the movie mean method to predic the rating
+     finally do standardize recover
+     """
     #standardize the rating according to per user habit
     pred_test = test.copy()
     pred_test.Rating = pred_test.Rating.apply(lambda x: float(x))
@@ -141,6 +162,11 @@ def movie_mean_user_habit_standardize(train, test, training=False):
 
 
 def movie_median_user_habit_standardize(train, test, training=False):
+     """
+     first standardize the train data according to user habit
+     use the movie median method to predic the rating
+     finally do standardize recover
+     """
     #standardize the rating according to per user mean and variance
     stand_train = user_habit_standardize(train)
 
@@ -158,6 +184,7 @@ def movie_median_user_habit_standardize(train, test, training=False):
     return pred_test
 
 def movie_mean_user_habit(train, test, training=False):
+     """use the movie mean plus user habit to be the rating predicted"""
     habit = user_habit(train)
     mean_per_movie = train.groupby('Movie').mean().Rating
 
@@ -179,6 +206,7 @@ def movie_mean_user_habit(train, test, training=False):
     return pred_test
 
 def movie_median_user_habit(train, test, training=False):
+    """use the movie median plus user habit to be the rating predicted"""
     habit = user_habit(train)
     median_per_movie = train.groupby('Movie').median().Rating
 
