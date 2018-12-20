@@ -42,7 +42,6 @@ def surprise_svd_best_params(train_path=train_dataset, verbose=True, t = Timer()
     #svd parameters
     n_factors = [50, 100, 200]
     n_epochss = np.linspace(200, 40, 9, dtype=np.int32)
-    n_epochss = [200, 500, 800]
     reg_alls = np.logspace(-2, -5, 4)
     lr_bus = np.logspace(-10, -2, 9)
     lr_qis = np.logspace(-10, -2, 9)

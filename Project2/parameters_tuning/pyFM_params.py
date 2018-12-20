@@ -6,6 +6,16 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 
+def toPyFMData(df):
+    """Transform pandas dataframe into the dataformat PyFM needs"""
+    data = []
+    users = set(df.User.unique())
+    movies = set(df.Movie.unique())
+    ratings = df.Rating.astype(float).tolist()
+    for row in df.iterrows():
+        data.append({"user_id": str(row[1].User), "movie_id": str(row[1].Movie)})
+    return (data, np.array(ratings), users, movies)
+
 def pyFM_cv_algo(algo, k_fold=5, verbose=True):
     
     kf = KFold(n_splits=k_fold)
