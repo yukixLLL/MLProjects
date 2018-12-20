@@ -325,7 +325,6 @@ def load_predictions(reading_folder):
 
 if __name__ == '__main__':
     # Get model to run
-    # WARNING: Surprise cannot run on the same time as Surprise_std if you try to run multiple instances of produce_predict_csv
     model_chosen = sys.argv[1] 
         
     if model_chosen == 'pyfm':
@@ -340,16 +339,6 @@ if __name__ == '__main__':
         models = load_mfrr_models()
     elif model_chosen == 'als':
         models = load_als_models()
-    elif model_chosen == 'surprise_user_std':
-        models = load_surprise_user_std_models()
-    elif model_chosen == 'spotlight_user_std':
-        models = load_spotlight_user_std_models()
-    elif model_chosen == 'mfrr_user_std':
-        models = load_mfrr_user_std_models()
-    elif model_chosen == 'als_user_std':
-        models = load_als_user_std_models()
-    elif model_chosen == 'pyfm_user_std':
-        models = load_pyfm_user_std_models()
  
     # prepare csv data for optimizing and predicted data for stacking    
     _, _ = predict_and_save(folder, models)

@@ -120,8 +120,8 @@ def optimize(models, ground_truth, folder):
     t.stop(verbose= False)
     
     # Initialize first weights (- nb columns for User, Movie)
-#     w0 = [1/(len(predictions.columns) - 2) for i in range(len(predictions.columns) - 2)]
-    w0 = [1.0/19 for i in range(19)]
+    w0 = [1/(len(predictions.columns) - 2) for i in range(len(predictions.columns) - 2)]
+#     w0 = [1.0/19 for i in range(19)]
     print("Initial weights: {}".format(w0))
     
     print("Optimizing...")
