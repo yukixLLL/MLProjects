@@ -1,10 +1,19 @@
 from surprise import *
 from surprise.model_selection import KFold, PredefinedKFold
 from surprise import accuracy
-from src.helpers import Timer
+from helpers import *
 import pandas as pd
 import numpy as np
 
+surprise_train_path = "../datas/surprise_train_svd.csv"
+train_dataset = "../datas/data_train.csv"
+
+def prepare_surprise_data(train):
+    """Save as a (User, Movie, Rating) pandas dataframe without column names"""
+    # save to csv for later use
+    print("[prepare_surprise_data] Saving to {}...".format(surprise_train_path))
+    train.to_csv(surprise_train_path, index=False, header=False)
+    
 def surprise_cv_algo(data, algo, k_fold=5, verbose=True):
     # Split into folds
     kf = KFold(n_splits=k_fold)
@@ -21,11 +30,14 @@ def surprise_cv_algo(data, algo, k_fold=5, verbose=True):
     rmse_mean = rmse_/k_fold
     return rmse_mean
     
-def surprise_svd_best_params(train_path="datas/train.csv", test_path="datas/test.csv", verbose=True, t = Timer()):
+def surprise_svd_best_params(train_path=train_dataset, verbose=True, t = Timer()):
+    train_df = load_dataset(train_path)
+    prepare_surprise_data(train_df)
+    
     # reader with rating scale
     reader = Reader(line_format='user item rating', sep=',', rating_scale=(1, 5))
     # load data from df
-    data = Dataset.load_from_file(train_path, reader)
+    data = Dataset.load_from_file(surprise_train_path, reader)
     
     #svd parameters
     n_factors = [50, 100, 200]
