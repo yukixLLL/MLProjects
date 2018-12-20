@@ -117,4 +117,4 @@ We have obtained RMSE of 1.017 on CrowdAI.
 
 ## Possible Issues
 
-* It is possible that with ALS (als.py), the numbers of the predictions might fluctuate a little (from 0.01 to 0.5 differences). We have not found the reason to this and we did not have enought time to investigate further. The small fluctuation does not seem to impact our results.
+* It is possible that with ALS (als.py), the numbers of the predictions might fluctuate a little (from 0.01 to 0.5 differences) in als_predictions.csv (not in submission.csv). We have not found the reason to this and we did not have enought time to investigate further. The small fluctuation does not seem to impact our results.
