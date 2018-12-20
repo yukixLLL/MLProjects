@@ -427,14 +427,14 @@ def als_algo(train_df,test_df, model):
     movie_user_predict_melt['Id'] = movie_user_predict_melt.apply(lambda x: 'r{}_c{}'.format(int(x.User), int(x.Movie)), axis=1)
     prediction = movie_user_predict_melt[movie_user_predict_melt.Id.isin(test_copy.Id.values)]
     prediction = prediction[["User","Movie","Rating"]]
-    
+    print("[als_algo] prediction: {}".format(prediction.head()))
     return prediction
 
 def als_algo_user_std(train_df,test_df, model):
     train_user_std = user_habit_standardize(train_df)
     pred = als_algo(train_user_std, test_df, model)
     # recover 
-    pred_recovered = user_habit_standardize_recover(train, pred)
+    pred_recovered = user_habit_standardize_recover(train_df, pred)
     
     return pred_recovered
 
