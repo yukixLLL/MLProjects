@@ -200,14 +200,31 @@ def get_best_weights(res, predictions, ground_truth):
     return best_dict, rmse
 
 
-def predict(weight_dict, predictions):    
+def predict(weight_dict, models):
+    print("Loading predictions....")
+    predictions = load_predictions(folder_predict)
+    print("Finished loading.")
+    
     existing_models = predictions.columns[2:].tolist()
+    
     stacked = np.zeros(predictions.shape[0])
-    for model in existing_models:
-        weight = weight_dict[model]
-        print("Stacking {} * {}...".format(weight, model))
-        stacked = stacked + weight * predictions[model]
+    for key, model_fam in models.items():
+        for name in model_fam.keys():
+            if name in existing_models:
+                weight = weight_dict[name]
+                print("Stacking {} * {}...".format(weight, name))
+                stacked = stacked + weight * predictions[name]
     
     pred = predictions[['User', 'Movie']].copy()
     pred['Rating'] = stacked
     return pred
+
+
+# if __name__ == '__main__':
+#     models = load_models()
+#     ground_truth = pd.read_csv(folder + "ground_truth.csv")
+#     res, predictions_tr = optimize(models, ground_truth, folder)
+#     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
+#     predictions = predict(best_dict)
+#     submission = create_csv_submission(predictions)
+#     submission.to_csv("./predictions_tr/blended_baseline.csv")
