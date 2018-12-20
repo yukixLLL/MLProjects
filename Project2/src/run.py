@@ -17,4 +17,4 @@ best_dict, rmse = get_best_weights(res, predictions, models, ground_truth)
 pred = predict(best_dict, models)
 # Create submission
 submission = create_csv_submission(pred)
-submission.to_csv("submission_run.csv")
+submission.to_csv("../submission.csv")
