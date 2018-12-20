@@ -112,8 +112,8 @@ def load_algos():
         spotlight_user_std = spotlight_algo_user_std, # spotlight_algo(train, test, model, verbose=True)
         pyfm = pyfm_algo,
         pyfm_user_std = pyfm_algo_user_std, 
-        mrff = mf_rr_algo,  # mf_rr_algo(train, test, model)
-        mrff_user_std = mf_rr_algo_user_std,  # mf_rr_algo(train, test, model)
+        mfrr = mf_rr_algo,  # mf_rr_algo(train, test, model)
+        mfrr_user_std = mf_rr_algo_user_std,  # mf_rr_algo(train, test, model)
         als = als_algo,
         als_user_std = als_algo_user_std,
     )
