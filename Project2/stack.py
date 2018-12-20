@@ -147,6 +147,7 @@ def optimize(models, ground_truth, folder):
     t.start()
     print("Loading predictions from {}....".format(folder))
     predictions = load_predictions(folder)
+    print("Predictions: {}".format(predictions.head()))
     print("Time: {}, Finished loading.".format(t.now()))
     t.stop(verbose= False)
     
@@ -173,6 +174,8 @@ def stack(weights, predictions, models):
     idx = 0
     for key, model_fam in models.items():
         for name in model_fam.keys():
+          # Check if the model exists in the columns
+          if name in list(predictions.columns):
             weight = weights[idx]
             stacked = stacked + weight * predictions[name]
             idx = idx + 1
@@ -181,15 +184,14 @@ def stack(weights, predictions, models):
     pred['Rating'] = stacked
     return pred
 
-def get_best_weights(res, models, predictions, ground_truth):
+def get_best_weights(res, predictions, ground_truth):
     # Create best dictionnary
+    existing_models = predictions.columns[2:].tolist()
     best_dict = {}
     idx = 0
-    for key, model_family in models.items():
-        best_dict[key] = dict()
-        for name in model_family.keys():
-            best_dict[key][name] = res.x[idx]
-            idx = idx + 1
+    for model in existing_models:
+        best_dict[model] = res.x[idx]
+        idx = idx + 1
     
     print("Best weights: \n {}".format(best_dict))
     # test
@@ -198,29 +200,14 @@ def get_best_weights(res, models, predictions, ground_truth):
     return best_dict, rmse
 
 
-def predict(weight_dict):
-    print("Loading predictions....")
-    predictions = load_predictions(folder_predict)
-    print("Finished loading.")
-    
+def predict(weight_dict, predictions):    
+    existing_models = predictions.columns[2:].tolist()
     stacked = np.zeros(predictions.shape[0])
-    for key, model_fam in models.items():
-        weights = weight_dict[key]
-        for name in model_fam.keys():
-            weight = weights[name]
-            print("Stacking {} * {}...".format(weight, name))
-            stacked = stacked + weight * predictions[name]
+    for model in existing_models:
+        weight = weight_dict[model]
+        print("Stacking {} * {}...".format(weight, model))
+        stacked = stacked + weight * predictions[model]
     
     pred = predictions[['User', 'Movie']].copy()
     pred['Rating'] = stacked
     return pred
-
-
-# if __name__ == '__main__':
-#     models = load_models()
-#     ground_truth = pd.read_csv(folder + "ground_truth.csv")
-#     res, predictions_tr = optimize(models, ground_truth, folder)
-#     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
-#     predictions = predict(best_dict)
-#     submission = create_csv_submission(predictions)
-#     submission.to_csv("./predictions_tr/blended_baseline.csv")
