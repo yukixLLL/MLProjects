@@ -1,4 +1,4 @@
-from src.helpers import *
+from helpers import *
 import pandas as pd
 from spotlight.interactions import Interactions
 from spotlight.cross_validation import random_train_test_split

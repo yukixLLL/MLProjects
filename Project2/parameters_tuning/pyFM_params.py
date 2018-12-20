@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from src.helpers import *
+from helpers import *
 from pyfm import pylibfm
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.model_selection import KFold
@@ -56,7 +56,7 @@ def pyFM_cv(verbose=True, t = Timer()):
     
     print("Best pyFM rmse: {}. Params: factors: {}, learning_rates: {}".format(lowest_rmse, best_params['k'], best_params['rate']))
     
-train_dataset = "./datas/data_train.csv"
+train_dataset = "../datas/data_train.csv"
 train_df = load_dataset(train_dataset)
 
 t = Timer()
