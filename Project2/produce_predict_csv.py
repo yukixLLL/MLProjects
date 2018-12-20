@@ -293,7 +293,7 @@ def predict_and_save(saving_folder, models, training = True):
             predictions[model_name] = prediction
     if training:
         gt_path = saving_folder + "ground_truth.csv"
-        print("Ground Truth: \n{}".format(test_df.head())
+        print("Ground Truth: \n{}".format(test_df.head()))
         # Save if not existant 
         if not os.path.isfile(gt_path):
             print("Saving ground_truth to {}".format(gt_path))
