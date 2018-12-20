@@ -90,6 +90,12 @@ We are assuming the following folder structure:
 │   ├── user_mean_predictions.csv
 │   └── user_median_predictions.csv
 │  
+├── parameters_tuning (the tuning of ALS is found in als.py above)
+│   ├── pyFM_params.py                      # Script to find the best parameters of pyFM
+│   ├── spotlight_params.py         # Script to find the best parameters of pyFM
+│   ├── surprise_knn_params.py                 # Script to find the best parameters of pyFM
+│   └── surprise_svd_params.py                # Script to find the best parameters of pyFM 
+│
 ├── MLenv.yml                       # Environment file for Anaconda
 └── README.md                       # This file
 ```
