@@ -104,7 +104,7 @@ def load_predictions(reading_folder):
     for i, pred in enumerate(pred_array):
         print("Reading {}/{} : {}...".format(i + 1, len(pred_array), pred))
         p = pd.read_csv(join(reading_folder, pred), index_col=0).sort_values(by=['User', 'Movie']).reset_index(drop=True)
-        print(p.head())
+#         print(p.head())
         p = p.rename(index=str, columns={'Rating': get_model_name(pred)})
         predictions = pd.merge(predictions, p, how='outer', on=['User', 'Movie']).reset_index(drop=True)
     
@@ -175,7 +175,7 @@ def get_best_weights(res, predictions, models, ground_truth):
 def predict(weight_dict, models):
     print("Loading predictions from {}....".format(folder_predict))
     predictions = load_predictions(folder_predict)
-    print("Finished loading. Predictions: {}".format(predictions.columns.tolist()))
+    print("Finished loading.")
     
     existing_models = predictions.columns[2:].tolist()
     
