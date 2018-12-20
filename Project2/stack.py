@@ -38,10 +38,6 @@ def load_models():
             surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
         ),
-        surprise_algo_user_std = dict(
-            surprise_svd_user_std = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
-            surprise_knn_user_std = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
-        ),
         
 #         spotlight
         spotlight = dict(
@@ -54,23 +50,9 @@ def load_models():
                                    use_cuda=torch.cuda.is_available()),
         ),
 
-        spotlight_user_std = dict(
-            spotlight_user_std=ExplicitFactorizationModel(loss='regression',
-                                   embedding_dim=150,  # latent dimensionality
-                                   n_iter=50,  # number of epochs of training
-                                   batch_size=256,  # minibatch size
-                                   l2=1e-5,  # strength of L2 regularization
-                                   learning_rate=0.0001,
-                                   use_cuda=torch.cuda.is_available()),
-        ),
-        
         # als
         als = dict(
             als= None
-        ),
-        
-        als_user_std = dict(
-            als_user_std = None
         ),
         
         # pyfm
@@ -80,20 +62,10 @@ def load_models():
                           learning_rate_schedule="optimal")
         ),
         
-        pyfm_user_std = dict(
-            pyfm_user_std = pylibfm.FM(num_factors=20, num_iter=200, verbose=True, 
-                          task="regression", initial_learning_rate=0.001, 
-                          learning_rate_schedule="optimal")
-        ),
-        
         # MFRR
         mfrr = dict(
             mfrr= None
         ),
-        
-        mfrr_user_std = dict(
-            mfrr_user_std = None
-        )
     )
     
     model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
@@ -110,15 +82,10 @@ def load_algos():
     algo_dict = dict(
         baseline = baseline_algo, # baseline_algo(train, test, model)
         surprise = surprise_algo, # surprise_algo(train, test, algo, verbose=True, training=False)
-        surprise_user_std = surprise_algo_user_std,
         spotlight = spotlight_algo, # spotlight_algo(train, test, model, verbose=True)
-        spotlight_user_std = spotlight_algo_user_std, # spotlight_algo(train, test, model, verbose=True)
         pyfm = pyfm_algo,
-        pyfm_user_std = pyfm_algo_user_std, 
         mfrr = mf_rr_algo,  # mf_rr_algo(train, test, model)
-        mfrr_user_std = mf_rr_algo_user_std,  # mf_rr_algo(train, test, model)
         als = als_algo,
-        als_user_std = als_algo_user_std,
     )
     return algo_dict
 
@@ -137,6 +104,7 @@ def load_predictions(reading_folder):
     for i, pred in enumerate(pred_array):
         print("Reading {}/{} : {}...".format(i + 1, len(pred_array), pred))
         p = pd.read_csv(join(reading_folder, pred), index_col=0).sort_values(by=['User', 'Movie']).reset_index(drop=True)
+        print(p.head())
         p = p.rename(index=str, columns={'Rating': get_model_name(pred)})
         predictions = pd.merge(predictions, p, how='outer', on=['User', 'Movie']).reset_index(drop=True)
     
@@ -152,7 +120,9 @@ def optimize(models, ground_truth, folder):
     t.stop(verbose= False)
     
     # Initialize first weights (- nb columns for User, Movie)
-    w0 = [1/(len(predictions.columns) - 2) for i in range(len(predictions.columns) - 2)]
+#     w0 = [1/(len(predictions.columns) - 2) for i in range(len(predictions.columns) - 2)]
+    w0 = [1.0/19 for i in range(19)]
+    print("Initial weights: {}".format(w0))
     
     print("Optimizing...")
     t.start()
@@ -184,14 +154,16 @@ def stack(weights, predictions, models):
     pred['Rating'] = stacked
     return pred
 
-def get_best_weights(res, predictions, ground_truth):
+def get_best_weights(res, predictions, models, ground_truth):
     # Create best dictionnary
     existing_models = predictions.columns[2:].tolist()
     best_dict = {}
     idx = 0
-    for model in existing_models:
-        best_dict[model] = res.x[idx]
-        idx = idx + 1
+    for key, model_fam in models.items():
+        for name in model_fam.keys():
+            if name in existing_models:
+                best_dict[name] = res.x[idx]
+                idx = idx + 1
     
     print("Best weights: \n {}".format(best_dict))
     # test
@@ -201,9 +173,9 @@ def get_best_weights(res, predictions, ground_truth):
 
 
 def predict(weight_dict, models):
-    print("Loading predictions....")
+    print("Loading predictions from {}....".format(folder_predict))
     predictions = load_predictions(folder_predict)
-    print("Finished loading.")
+    print("Finished loading. Predictions: {}".format(predictions.columns.tolist()))
     
     existing_models = predictions.columns[2:].tolist()
     
@@ -218,13 +190,3 @@ def predict(weight_dict, models):
     pred = predictions[['User', 'Movie']].copy()
     pred['Rating'] = stacked
     return pred
-
-
-# if __name__ == '__main__':
-#     models = load_models()
-#     ground_truth = pd.read_csv(folder + "ground_truth.csv")
-#     res, predictions_tr = optimize(models, ground_truth, folder)
-#     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
-#     predictions = predict(best_dict)
-#     submission = create_csv_submission(predictions)
-#     submission.to_csv("./predictions_tr/blended_baseline.csv")
