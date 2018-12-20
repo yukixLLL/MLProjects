@@ -1,0 +1,97 @@
+Loading baseline models...
+1 model families loaded:
+ mrff: mrff, ; 
+
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Splitting data for training...
+[split_dataset] Valid: (1176952, 3)
+Results of split:    User  Movie  Rating
+0  4292    161       3
+1  7913    757       4
+2  7963    418       2
+3  8809    168       2
+4  4814    416       4; 
+    User  Movie  Rating
+0  1207    877       3
+1  2337    179       3
+2  4221    971       4
+3  2306    148       5
+4  3092    188       4
+Predicting using algo: <function mf_rr_algo at 0x7f9f72e81488>, model: mrff...
+Time: 0:00:00.000015, predicting with model: mrff
+MF-RR training RMSE : 0.9882520440836533
+MF-RR training RMSE : 0.973811805649175
+MF-RR training RMSE : 0.9619892338051959
+MF-RR training RMSE : 0.9549240639499943
+MF-RR training RMSE : 0.950516473373288
+MF-RR training RMSE : 0.9479054988765238
+MF-RR training RMSE : 0.9464327056478579
+MF-RR training RMSE : 0.9456552744896836
+MF-RR training RMSE : 0.9453098438373346
+MF-RR training RMSE : 0.9452557333615356
+MF-RR training RMSE : 0.9453944010045974
+MF-RR training RMSE : 0.9456600509254139
+MF-RR training RMSE : 0.9460077376469327
+MF-RR training RMSE : 0.9464063537712412
+MF-RR training RMSE : 0.9468336820771446
+MF-RR training RMSE : 0.9472734561226851
+MF-RR training RMSE : 0.9477139680980536
+MF-RR training RMSE : 0.9481465652388836
+MF-RR training RMSE : 0.9485651599443413
+MF-RR training RMSE : 0.9489654743013034
+MF-RR training RMSE : 0.949344648994425
+MF-RR training RMSE : 0.9497010525679545
+MF-RR training RMSE : 0.9500338893428485
+MF-RR training RMSE : 0.9503430732213773
+MF-RR training RMSE : 0.9506290039934344
+MF-RR training RMSE : 0.950892483793621
+MF-RR training RMSE : 0.9511344644645258
+MF-RR training RMSE : 0.9513561045658425
+MF-RR training RMSE : 0.9515586571088511
+MF-RR training RMSE : 0.9517433673597905
+MF-RR training RMSE : 0.9519115161757228
+MF-RR training RMSE : 0.9520643268261741
+MF-RR training RMSE : 0.9522029868525875
+MF-RR training RMSE : 0.9523285708307786
+MF-RR training RMSE : 0.952442180509527
+MF-RR training RMSE : 0.9525448296265601
+MF-RR training RMSE : 0.9526374297036609
+MF-RR training RMSE : 0.9527208363036019
+MF-RR training RMSE : 0.9527958200060337
+MF-RR training RMSE : 0.9528630879171122
+MF-RR training RMSE : 0.9529233013418393
+MF-RR training RMSE : 0.952977075201729
+MF-RR training RMSE : 0.9530249585682719
+MF-RR training RMSE : 0.9530674715771094
+MF-RR training RMSE : 0.9531050869014377
+MF-RR training RMSE : 0.9531382209785831
+MF-RR training RMSE : 0.9531672487027741
+MF-RR training RMSE : 0.9531925439033385
+MF-RR training RMSE : 0.9532144456305001
+MF-RR training RMSE : 0.9532332715506315
+Time: 0:37:12.839967, Saving results of mrff...
+
+Saving ground_truth to ./user_std_predict_save/ground_truth_0:37:16.607266.csv
+[load_dataset] Valid: (1176952, 3)
+[load_dataset] Valid: (1176952, 3)
+Predicting using algo: <function mf_rr_algo at 0x7f9f72e81488>, model: mrff...
+Time: 0:00:00.000033, predicting with model: mrff
+MF-RR training RMSE : 0.9826006346547083
+MF-RR training RMSE : 0.9599752434490971
+MF-RR training RMSE : 0.9480834050645004
+MF-RR training RMSE : 0.9418620891000383
+MF-RR training RMSE : 0.9381700437817936
+MF-RR training RMSE : 0.9358506445235225
+MF-RR training RMSE : 0.9343520760795159
+MF-RR training RMSE : 0.933367344048488
+MF-RR training RMSE : 0.9327161180747822
+MF-RR training RMSE : 0.9322879420295718
+MF-RR training RMSE : 0.9320119926401741
+MF-RR training RMSE : 0.9318430894701971
+MF-RR training RMSE : 0.9317508961396982
+MF-RR training RMSE : 0.9317146402056687
+MF-RR training RMSE : 0.9317201948160002
+Converge!
+Time: 0:16:10.881294, Saving results of mrff...
+
