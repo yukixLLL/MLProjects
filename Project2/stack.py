@@ -7,6 +7,7 @@ from pyfm_helpers import *
 from als import *
 from MFRR import *
 import scipy.optimize as sco
+from constants import *
 
 from os import listdir
 from os.path import isfile, join
@@ -34,12 +35,11 @@ def load_models():
 #         surprise
         surprise = dict(
             surprise_svd = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
-#             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
             surprise_knn = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
+            surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
         ),
         surprise_algo_user_std = dict(
             surprise_svd_user_std = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
-#             surprise_svd_pp = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
             surprise_knn_user_std = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
         ),
         
@@ -97,8 +97,11 @@ def load_models():
     )
     
     model_msg = "{} model families loaded:\n ".format(len(list(models_dict.keys())))
-    for i in list(models_dict.keys()):
-        model_msg = model_msg + "{}; ".format(i)
+    for i, model in models_dict.items():
+        model_msg = model_msg + "{}: ".format(i)
+        for key, value in model.items():
+            model_msg = model_msg + "{}, ".format(key)
+        model_msg = model_msg + "; \n"
     print(model_msg)
     return models_dict
    
@@ -118,53 +121,6 @@ def load_algos():
         als_user_std = als_algo_user_std,
     )
     return algo_dict
-
-# def predict_and_save(saving_folder, training = True):
-#     # create folder 
-#     if os.path.exists(saving_folder):
-#         shutil.rmtree(saving_folder)
-    
-#     os.makedirs(saving_folder)
-    
-#     # load csv
-#     train_df = load_dataset(train_dataset, min_num_ratings = 0)
-#     test_df = load_dataset(test_dataset, min_num_ratings = 0)
-    
-#     # Split training to blend
-#     if training:
-#         print("Splitting data for training...")
-#         train = train_df.copy()
-#         train_df, test_df = split_dataset(train_df, p_test=0.5, min_num_ratings = 0)
-#         # folds_dict = define_folds(train_df, 5) - FOR FOLDS?
-    
-#     # dictionary of the predictions
-#     predictions = dict()
-        
-#     # load models
-#     models_dict = load_models()
-#     # load algos
-#     algo_dict = load_algos()
-#     t = Timer()
-#     t.start()
-#     for model_family_name, model_family in models_dict.items():
-#         algo = algo_dict[model_family_name]
-#         print("Predicting using algo: {}, model: {}...".format(algo, model_family_name))
-
-#         for model_name, model in model_family.items():
-#             print("Time: {}, predicting with model: {}".format(t.now(), model_name))
-#             if model_family == 'baseline':
-#                 if training:
-#                     prediction = algo(train, test_df, model)
-#                 else: # predicting
-#                     prediction = algo(train_df.copy(), test_df.copy(), model)
-#             else:
-#                 prediction = algo(train_df, test_df, model)
-#             print("Time: {}, Saving results of {}...\n".format(t.now(), model_name))
-#             prediction.to_csv("{}{}_predictions({}).csv".format(saving_folder, model_name, t.now()))
-#             predictions[model_name] = prediction
-        
-#     return predictions, test_df
-
 
 def load_predictions(reading_folder):
     def get_model_name(file_name):
@@ -243,8 +199,7 @@ def get_best_weights(res, models, predictions, ground_truth):
 
 
 def predict(weight_dict):
-    print("Predicting....")
-#     predictions, _ = predict_and_save(folder_predict, training=False)
+    print("Loading predictions....")
     predictions = load_predictions(folder_predict)
     print("Finished loading.")
     
@@ -261,16 +216,11 @@ def predict(weight_dict):
     return pred
 
 
-if __name__ == '__main__':
-    folder = "./predict_save/"
-    folder_predict = "./train_predictions/"
-    models = load_models()
-    # Predict & save in advance
-#     predictions, ground_truth = predict_and_save(folder)
-#     _, _ = predict_and_save(folder_predict, training=False)
-    ground_truth = pd.read_csv(folder + "ground_truth.csv")
-    res, predictions_tr = optimize(models, ground_truth, folder)
-    best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
-    predictions = predict(best_dict)
-    submission = create_csv_submission(predictions)
-    submission.to_csv("./predictions_tr/blended_baseline.csv")
+# if __name__ == '__main__':
+#     models = load_models()
+#     ground_truth = pd.read_csv(folder + "ground_truth.csv")
+#     res, predictions_tr = optimize(models, ground_truth, folder)
+#     best_dict, rmse = get_best_weights(res, models, predictions_tr, ground_truth)
+#     predictions = predict(best_dict)
+#     submission = create_csv_submission(predictions)
+#     submission.to_csv("./predictions_tr/blended_baseline.csv")

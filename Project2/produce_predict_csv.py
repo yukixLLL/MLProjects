@@ -70,7 +70,7 @@ def load_surprise_user_std_models():
         surprise_user_std = dict(
             surprise_svd_user_std = SVD(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),           
             surprise_knn_user_std = KNNBaseline(k=100, sim_options={'name': 'pearson_baseline', 'user_based': False}),
-            surprise_svd_pp_user_std = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
+#             surprise_svd_pp_user_std = SVDpp(n_factors=50, n_epochs=200, lr_bu=1e-9 , lr_qi=1e-5, reg_all=0.01),
         )
     )
     
@@ -252,7 +252,6 @@ def load_als_user_std_models():
 def predict_and_save(saving_folder, models, training = True):
     # create folder 
     if not os.path.exists(saving_folder):
-#         shutil.rmtree(saving_folder)
         os.makedirs(saving_folder)
     
     # load csv
@@ -265,7 +264,6 @@ def predict_and_save(saving_folder, models, training = True):
         train = train_df.copy()
         train_df, test_df = split_dataset(train_df, p_test=0.5, min_num_ratings = 0)
         print("Results of split: {}; \n {}".format(train_df.head(), test_df.head()))
-        # folds_dict = define_folds(train_df, 5) - FOR FOLDS?
     
     # dictionary of the predictions
     predictions = dict()
@@ -294,9 +292,12 @@ def predict_and_save(saving_folder, models, training = True):
             prediction.to_csv("{}{}_predictions_{}.csv".format(saving_folder, model_name, t.now()))
             predictions[model_name] = prediction
     if training:
-        gt_path = saving_folder + "ground_truth_{}.csv".format(t.now())
-        print("Saving ground_truth to {}".format(gt_path))
-        test_df.to_csv(gt_path)
+        gt_path = saving_folder + "ground_truth.csv"
+        print("Ground Truth: \n{}".format(test_df.head())
+        # Save if not existant 
+        if not os.path.isfile(gt_path)
+            print("Saving ground_truth to {}".format(gt_path))
+            test_df.to_csv(gt_path)
         
     t.stop()
     return predictions, test_df
@@ -323,15 +324,9 @@ def load_predictions(reading_folder):
 
 
 if __name__ == '__main__':
-    std = sys.argv[1]
-    model_chosen = sys.argv[2] 
-    
-    if std == 'std':
-        folder = "./user_std_predict_save/"
-        folder_predict = "./user_std_train_predictions/"
-    elif std == 'none':
-        folder = "./predict_save/"
-        folder_predict = "./train_predictions/"
+    # Get model to run
+    # WARNING: Surprise cannot run on the same time as Surprise_std if you try to run multiple instances of produce_predict_csv
+    model_chosen = sys.argv[1] 
         
     if model_chosen == 'pyfm':
         models = load_pyfm_models()
@@ -357,5 +352,5 @@ if __name__ == '__main__':
         models = load_pyfm_user_std_models()
  
     # prepare csv data for optimizing and predicted data for stacking    
-    predictions, ground_truth = predict_and_save(folder, models)
+    _, _ = predict_and_save(folder, models)
     _, _ = predict_and_save(folder_predict, models, training=False)
