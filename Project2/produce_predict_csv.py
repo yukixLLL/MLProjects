@@ -289,7 +289,7 @@ def predict_and_save(saving_folder, models, training = True):
             else:
                 prediction = algo(train_df, test_df, model)
             print("Time: {}, Saving results of {}...\n".format(t.now(), model_name))
-            prediction.to_csv("{}{}_predictions_{}.csv".format(saving_folder, model_name, t.now()))
+            prediction.to_csv("{}{}_predictions.csv".format(saving_folder, model_name))
             predictions[model_name] = prediction
     if training:
         gt_path = saving_folder + "ground_truth.csv"
